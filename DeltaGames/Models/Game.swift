@@ -16,7 +16,7 @@ struct Game: Identifiable, Codable {
     let backgroundImage: String?
     let rating: Double?
     let ratingTop: Int?
-    let ratingsCount: Int
+    let ratingsCount: Int?
     let genres: [Genre]?
     let parentPlatforms: [Platform]?
     let tags: [Genre]?

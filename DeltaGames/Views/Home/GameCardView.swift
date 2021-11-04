@@ -16,15 +16,12 @@ struct GameCardView: View {
         VStack(alignment: .leading) {
             HStack {
                 Text("⭐️ \(String(format: "%.2f", game.rating ?? 0.0))/5")
-                    .font(Font.subheadline.weight(.bold))
+                    .font(Font.caption.weight(.bold))
                     .foregroundColor(.primary)
                 Spacer()
-                Button {
-                    print("Button tapped")
-                } label: {
-                    Image(systemName: "heart.circle.fill").font(.system(size: 36))
-                        .foregroundColor(Color.white)
-                }
+                Text(game.released ?? "-")
+                    .font(Font.caption.weight(.bold))
+                    .foregroundColor(.primary)
             }
             Spacer()
             Text(game.name)

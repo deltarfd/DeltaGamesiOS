@@ -32,14 +32,22 @@ struct MainView: View {
                         Label("Search", systemImage: "magnifyingglass.circle")
                     }
                 }.tag(1)
-            ProfileView()
+            FavoriteView(favoriteViewModel: FavoriteViewModel())
                 .tabItem {
                     if selection == 2 {
+                        Label("Favorite", systemImage: "heart.circle.fill")
+                    } else {
+                        Label("Favorite", systemImage: "heart.circle")
+                    }
+                }.tag(2)
+            ProfileView()
+                .tabItem {
+                    if selection == 3 {
                         Label("Profile", systemImage: "person.crop.circle.fill")
                     } else {
                         Label("Profile", systemImage: "person.crop.circle")
                     }
-                }.tag(2)
+                }.tag(3)
         }
     }
 }

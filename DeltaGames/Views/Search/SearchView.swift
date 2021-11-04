@@ -33,7 +33,16 @@ struct SearchView: View {
                             searchViewModel.fetchSearchGames(search: searchViewModel.searchQuery)
                         }
                     case .onSuccess:
-                        searchGameView
+                        if searchViewModel.searchGames.isEmpty {
+                            HStack {
+                                Spacer()
+                                Text("Game is Not Found")
+                                    .padding(.top, 64)
+                                Spacer()
+                            }
+                        } else {
+                            searchGameView
+                        }
                     case .onFailed(let message):
                         Text(message)
                     }

@@ -54,7 +54,5 @@ class HomeViewModel: ObservableObject {
                 }
             }
         }
-        
     }
-    
 }
