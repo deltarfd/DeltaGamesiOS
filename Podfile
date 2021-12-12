@@ -8,5 +8,7 @@ target 'DeltaGames' do
   # Pods for DeltaGames
   pod 'SwiftLint'
   pod 'SDWebImageSwiftUI'
+  pod 'Alamofire'
+  pod 'RealmSwift'
 
 end

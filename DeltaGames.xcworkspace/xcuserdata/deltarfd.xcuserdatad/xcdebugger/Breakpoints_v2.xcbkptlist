@@ -20,5 +20,53 @@
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "7B2AEB2A-CFD3-40C3-8031-403164618DE1"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DeltaGames/Core/Data/Locale/LocaleDataSource.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "28"
+            endingLineNumber = "28"
+            landmarkName = "init(realm:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "7B2AEB2A-CFD3-40C3-8031-403164618DE1 - 71c29d5a48471b04"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "DeltaGames.LocaleDataSource.__allocating_init(realm: Swift.Optional&lt;RealmSwift.Realm&gt;) -&gt; DeltaGames.LocaleDataSource"
+                  moduleName = "DeltaGames"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/deltarfd/Documents/iOS%20Learn/Dicoding-Submission/iOSPath/Intermediate/Final/DeltaSubmission/DeltaGames/DeltaGames/Core/Data/Locale/LocaleDataSource.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "0"
+                  endingLineNumber = "0"
+                  offsetFromSymbolStart = "11">
+               </Location>
+               <Location
+                  uuid = "7B2AEB2A-CFD3-40C3-8031-403164618DE1 - d78352f3f545fdb2"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "DeltaGames.LocaleDataSource.(in _E3C34484594B89FA045AB7EE1446E4F2).init(realm: Swift.Optional&lt;RealmSwift.Realm&gt;) -&gt; DeltaGames.LocaleDataSource"
+                  moduleName = "DeltaGames"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/deltarfd/Documents/iOS%20Learn/Dicoding-Submission/iOSPath/Intermediate/Final/DeltaSubmission/DeltaGames/DeltaGames/Core/Data/Locale/LocaleDataSource.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "29"
+                  endingLineNumber = "29"
+                  offsetFromSymbolStart = "56">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
    </Breakpoints>
 </Bucket>
