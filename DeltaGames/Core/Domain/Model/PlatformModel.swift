@@ -10,8 +10,11 @@ import Foundation
 struct PlatformModel: Equatable {
     let platform: ChildPlatformModel
     struct ChildPlatformModel: Equatable, Identifiable {
-        let id: Int
-        let slug: String
-        let name: String
+      public init(name: String) {
+          self.name = name
+      }
+      let id: Int = 0
+      let slug: String = ""
+      let name: String
     }
 }

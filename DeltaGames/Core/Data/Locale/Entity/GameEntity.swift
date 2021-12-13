@@ -19,9 +19,9 @@ class GameEntity: Object {
   @Persisted dynamic var rating: Double = 0
   @Persisted dynamic var ratingTop: Int = 0
   @Persisted dynamic var ratingsCount: Int = 0
-  @Persisted dynamic var genres = List<GenreEntity>()
-  @Persisted dynamic var parentPlatforms = List<PlatformEntity>()
-  @Persisted dynamic var tags = List<TagsEntity>()
+  @Persisted dynamic var genres = List<String>()
+  @Persisted dynamic var parentPlatforms = List<String>()
+  @Persisted dynamic var tags = List<String>()
 
   override static func primaryKey() -> String? {
     return "id"

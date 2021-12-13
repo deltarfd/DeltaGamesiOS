@@ -9,62 +9,68 @@ import Foundation
 
 final class GameMapper {
 
-  static func mapGameResponsesToEntities(
-    input gameResponses: GameResponse
-  ) -> GameEntity {
-      let newGame = GameEntity()
-      newGame.id = gameResponses.id
-      newGame.slug = gameResponses.slug
-      newGame.name = gameResponses.name
-      newGame.descript = gameResponses.description ?? ""
-      newGame.released = gameResponses.released ?? ""
-      newGame.backgroundImage = gameResponses.imageBackground ?? ""
-      newGame.rating = gameResponses.rating ?? 0
-      newGame.ratingTop = gameResponses.ratingTop ?? 0
-      newGame.ratingsCount = gameResponses.ratingsCount ?? 0
-      newGame.genres.append(objectsIn: GenreMapper.mapGenreResponsesToEntities(input: gameResponses.genres ?? []))
-      newGame.parentPlatforms.append(objectsIn: PlatformMapper.mapPlatformResponsesToEntities(input: gameResponses.parentPlatforms ?? []))
-      newGame.tags.append(objectsIn: TagsMapper.mapTagsResponsesToEntities(input: gameResponses.tags ?? []))
-      
-      return newGame
-    }
+//  static func mapGameResponsesToEntities(
+//    input gameResponses: GameResponse
+//  ) -> GameEntity {
+//      let newGame = GameEntity()
+//      newGame.id = gameResponses.id
+//      newGame.slug = gameResponses.slug
+//      newGame.name = gameResponses.name
+//      newGame.descript = gameResponses.description ?? ""
+//      newGame.released = gameResponses.released ?? ""
+//      newGame.backgroundImage = gameResponses.imageBackground ?? ""
+//      newGame.rating = gameResponses.rating ?? 0
+//      newGame.ratingTop = gameResponses.ratingTop ?? 0
+//      newGame.ratingsCount = gameResponses.ratingsCount ?? 0
+//      newGame.genres.append(objectsIn: GenreMapper.mapGenreResponsesToEntities(input: gameResponses.genres ?? []))
+//      newGame.parentPlatforms.append(objectsIn: PlatformMapper.mapPlatformResponsesToEntities(input: gameResponses.parentPlatforms ?? []))
+//      newGame.tags.append(objectsIn: TagsMapper.mapTagsResponsesToEntities(input: gameResponses.tags ?? []))
+//
+//      return newGame
+//    }
 
-  static func mapGameEntitiesToDomains(
-    input gameEntities: GameEntity
-  ) -> GameModel {
-      return GameModel(
-        id: gameEntities.id,
-        slug: gameEntities.slug,
-        name: gameEntities.name,
-        description: gameEntities.descript,
-        released: gameEntities.released,
-        imageBackground: gameEntities.backgroundImage,
-        rating: gameEntities.rating,
-        ratingTop: gameEntities.ratingTop,
-        ratingsCount: gameEntities.ratingsCount,
-        genres: GenreMapper.mapGenreEntitiesToDomains(input: Array(gameEntities.genres)),
-        parentPlatforms: PlatformMapper.mapPlatformEntitiesToDomains(input: Array(gameEntities.parentPlatforms)),
-        tags: TagsMapper.mapTagsEntitiesToDomains(input: Array(gameEntities.tags))
-      )
-  }
+//  static func mapGameEntitiesToDomains(
+//    input gameEntities: GameEntity
+//  ) -> GameModel {
+//      return GameModel(
+//        id: gameEntities.id,
+//        slug: gameEntities.slug,
+//        name: gameEntities.name,
+//        description: gameEntities.descript,
+//        released: gameEntities.released,
+//        imageBackground: gameEntities.backgroundImage,
+//        rating: gameEntities.rating,
+//        ratingTop: gameEntities.ratingTop,
+//        ratingsCount: gameEntities.ratingsCount,
+//        genres: GenreMapper.mapGenreEntitiesToDomains(input: Array(gameEntities.genres)),
+//        parentPlatforms: PlatformMapper.mapPlatformEntitiesToDomains(input: Array(gameEntities.parentPlatforms)),
+//        tags: TagsMapper.mapTagsEntitiesToDomains(input: Array(gameEntities.tags))
+//      )
+//  }
   
   static func mapGameDomainsToEntities(
-    input gameDomains: GameModel
+    input gameModel: GameModel
   ) -> GameEntity {
-    let newGame = GameEntity()
-    newGame.id = gameDomains.id
-    newGame.slug = gameDomains.slug
-    newGame.name = gameDomains.name
-    newGame.descript = gameDomains.description ?? ""
-    newGame.released = gameDomains.released ?? ""
-    newGame.backgroundImage = gameDomains.imageBackground ?? ""
-    newGame.rating = gameDomains.rating ?? 0
-    newGame.ratingTop = gameDomains.ratingTop ?? 0
-    newGame.ratingsCount = gameDomains.ratingsCount ?? 0
-    newGame.genres.append(objectsIn: GenreMapper.mapGenreDomainsToEntities(input: gameDomains.genres ?? []))
-    newGame.parentPlatforms.append(objectsIn: PlatformMapper.mapPlatformDomainsToEntities(input: gameDomains.parentPlatforms ?? []))
-    newGame.tags.append(objectsIn: TagsMapper.mapTagsDomainsToEntities(input: gameDomains.tags ?? []))
-    return newGame
+    let gameEntity = GameEntity()
+    gameEntity.id = gameModel.id
+    gameEntity.slug = gameModel.slug
+    gameEntity.name = gameModel.name
+    gameEntity.descript = gameModel.description ?? ""
+    gameEntity.released = gameModel.released ?? ""
+    gameEntity.backgroundImage = gameModel.imageBackground ?? ""
+    gameEntity.rating = gameModel.rating ?? 0
+    gameEntity.ratingTop = gameModel.ratingTop ?? 0
+    gameEntity.ratingsCount = gameModel.ratingsCount ?? 0
+    for platform in gameModel.parentPlatforms! {
+      gameEntity.parentPlatforms.append(platform.platform.name)
+    }
+    for genre in gameModel.genres! {
+        gameEntity.genres.append(genre.name)
+    }
+    for tag in gameModel.tags! {
+        gameEntity.genres.append(tag.name)
+    }
+    return gameEntity
   }
   
   static func mapGameResponsesToDomains(

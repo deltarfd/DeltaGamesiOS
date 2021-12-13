@@ -12,18 +12,19 @@ class HomePresenter: ObservableObject {
   private var cancellables: Set<AnyCancellable> = []
   private let router = HomeRouter()
   private let homeUseCase: HomeUseCase
-
-  @Published var games: [GameModel] = []
+  
   @Published var trending: [GameModel] = []
+  @Published var games: [GameModel] = []
   @Published var errorMessage: String = ""
-  @Published var loadingState: Bool = false
+  @Published var loadingTrending: Bool = false
+  @Published var loadingGames: Bool = false
   
   init(homeUseCase: HomeUseCase) {
     self.homeUseCase = homeUseCase
   }
   
   func getGames() {
-    loadingState = true
+    loadingGames = true
     homeUseCase.getGames()
       .receive(on: RunLoop.main)
       .sink(receiveCompletion: { completion in
@@ -31,7 +32,7 @@ class HomePresenter: ObservableObject {
           case .failure:
             self.errorMessage = String(describing: completion)
           case .finished:
-            self.loadingState = false
+            self.loadingGames = false
           }
         }, receiveValue: { games in
           self.games = games
@@ -40,7 +41,7 @@ class HomePresenter: ObservableObject {
   }
   
   func getTrending(ordering: String, discover: String) {
-    loadingState = true
+    loadingTrending = true
     homeUseCase.getTrending(ordering: ordering, discover: discover)
       .receive(on: RunLoop.main)
       .sink(receiveCompletion: { completion in
@@ -48,7 +49,7 @@ class HomePresenter: ObservableObject {
           case .failure:
             self.errorMessage = String(describing: completion)
           case .finished:
-            self.loadingState = false
+            self.loadingTrending = false
           }
         }, receiveValue: { trending in
           self.trending = trending

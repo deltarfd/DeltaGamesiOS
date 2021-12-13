@@ -13,21 +13,26 @@ final class GamesMapper {
     input gamesResponses: [GameResponse]
   ) -> [GameEntity] {
     return gamesResponses.map { result in
-      let newGame = GameEntity()
-      newGame.id = result.id
-      newGame.slug = result.slug
-      newGame.name = result.name
-      newGame.descript = result.description ?? ""
-      newGame.released = result.released ?? ""
-      newGame.backgroundImage = result.imageBackground ?? ""
-      newGame.rating = result.rating ?? 0
-      newGame.ratingTop = result.ratingTop ?? 0
-      newGame.ratingsCount = result.ratingsCount ?? 0
-      newGame.genres.append(objectsIn: GenreMapper.mapGenreResponsesToEntities(input: result.genres ?? []))
-      newGame.parentPlatforms.append(objectsIn: PlatformMapper.mapPlatformResponsesToEntities(input: result.parentPlatforms ?? []))
-      newGame.tags.append(objectsIn: TagsMapper.mapTagsResponsesToEntities(input: result.tags ?? []))
-      
-      return newGame
+      let gameEntity = GameEntity()
+      gameEntity.id = result.id
+      gameEntity.slug = result.slug
+      gameEntity.name = result.name
+      gameEntity.descript = result.description ?? ""
+      gameEntity.released = result.released ?? ""
+      gameEntity.backgroundImage = result.imageBackground ?? ""
+      gameEntity.rating = result.rating ?? 0
+      gameEntity.ratingTop = result.ratingTop ?? 0
+      gameEntity.ratingsCount = result.ratingsCount ?? 0
+      for platform in result.parentPlatforms! {
+        gameEntity.parentPlatforms.append(platform.platform.name)
+      }
+      for genre in result.genres! {
+          gameEntity.genres.append(genre.name)
+      }
+      for tag in result.tags! {
+          gameEntity.genres.append(tag.name)
+      }
+      return gameEntity
     }
   }
 
@@ -45,9 +50,15 @@ final class GamesMapper {
         rating: result.rating,
         ratingTop: result.ratingTop,
         ratingsCount: result.ratingsCount,
-        genres: GenreMapper.mapGenreEntitiesToDomains(input: Array(result.genres)),
-        parentPlatforms: PlatformMapper.mapPlatformEntitiesToDomains(input: Array(result.parentPlatforms)),
-        tags: TagsMapper.mapTagsEntitiesToDomains(input: Array(result.tags))
+        genres: result.genres.map { result in
+          return GenreModel(name: result)
+        },
+        parentPlatforms: result.parentPlatforms.map { result in
+          return PlatformModel(platform: PlatformModel.ChildPlatformModel(name: result))
+        },
+        tags: result.tags.map { result in
+          return TagsModel(name: result)
+        }
       )
     }
   }
