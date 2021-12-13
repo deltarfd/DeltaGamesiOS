@@ -42,12 +42,20 @@ struct HomeView: View {
                     .font(Font.title2.weight(.bold))
                     .foregroundColor(Color("PrimaryColor"))
                 ZStack {
-                  if self.presenter.loadingTrending {
-                    ProgressView()
-                  } else if presenter.errorMessage != "" {
-                    trendingGamesView
-                  } else {
-                    Text(presenter.errorMessage)
+                  VStack {
+                    Spacer()
+                    HStack(alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/) {
+                      Spacer()
+                      if self.presenter.loadingTrending {
+                        ProgressView()
+                      } else if presenter.errorMessage != "" {
+                        trendingGamesView
+                      } else {
+                        Text(presenter.errorMessage)
+                      }
+                      Spacer()
+                    }
+                    Spacer()
                   }
                 }
                 .onAppear {
@@ -60,12 +68,20 @@ struct HomeView: View {
                     .font(Font.title2.weight(.bold))
                     .foregroundColor(Color("PrimaryColor"))
                 ZStack {
-                  if self.presenter.loadingGames {
-                    ProgressView()
-                  } else if presenter.errorMessage != "" {
-                    allGamesView
-                  } else {
-                    Text(presenter.errorMessage)
+                  VStack {
+                    Spacer()
+                    HStack(alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/) {
+                      Spacer()
+                      if self.presenter.loadingGames {
+                        ProgressView()
+                      } else if presenter.errorMessage != "" {
+                        allGamesView
+                      } else {
+                        Text(presenter.errorMessage)
+                      }
+                      Spacer()
+                    }
+                    Spacer()
                   }
                 }
                 .onAppear {

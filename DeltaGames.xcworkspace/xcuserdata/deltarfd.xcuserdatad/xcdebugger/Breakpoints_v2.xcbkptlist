@@ -372,5 +372,53 @@
             </Locations>
          </BreakpointContent>
       </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "ADBC7FA8-7AD4-4DC1-B5B0-90C1A0C8E8AB"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DeltaGames/Core/Data/GamesRepository.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "52"
+            endingLineNumber = "52"
+            landmarkName = "getGames()"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "ADBC7FA8-7AD4-4DC1-B5B0-90C1A0C8E8AB - 8b77710b9868ccf9"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Array&lt;DeltaGames.GameEntity&gt;) -&gt; Combine.AnyPublisher&lt;Swift.Array&lt;DeltaGames.GameModel&gt;, Swift.Error&gt; in DeltaGames.GamesRepository.getGames() -&gt; Combine.AnyPublisher&lt;Swift.Array&lt;DeltaGames.GameModel&gt;, Swift.Error&gt;"
+                  moduleName = "DeltaGames"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/deltarfd/Documents/iOS%20Learn/Dicoding-Submission/iOSPath/Intermediate/Final/DeltaSubmission/DeltaGames/DeltaGames/Core/Data/GamesRepository.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "52"
+                  endingLineNumber = "52"
+                  offsetFromSymbolStart = "1237">
+               </Location>
+               <Location
+                  uuid = "ADBC7FA8-7AD4-4DC1-B5B0-90C1A0C8E8AB - 423d22ae2ec806da"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #4 (Swift.Bool) -&gt; Combine.Publishers.Map&lt;Combine.AnyPublisher&lt;Swift.Array&lt;DeltaGames.GameEntity&gt;, Swift.Error&gt;, Swift.Array&lt;DeltaGames.GameModel&gt;&gt; in closure #1 (Swift.Array&lt;DeltaGames.GameEntity&gt;) -&gt; Combine.AnyPublisher&lt;Swift.Array&lt;DeltaGames.GameModel&gt;, Swift.Error&gt; in DeltaGames.GamesRepository.getGames() -&gt; Combine.AnyPublisher&lt;Swift.Array&lt;DeltaGames.GameModel&gt;, Swift.Error&gt;"
+                  moduleName = "DeltaGames"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/deltarfd/Documents/iOS%20Learn/Dicoding-Submission/iOSPath/Intermediate/Final/DeltaSubmission/DeltaGames/DeltaGames/Core/Data/GamesRepository.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "52"
+                  endingLineNumber = "52"
+                  offsetFromSymbolStart = "22">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
    </Breakpoints>
 </Bucket>

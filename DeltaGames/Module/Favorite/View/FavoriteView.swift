@@ -11,51 +11,57 @@ struct FavoriteView: View {
     @ObservedObject var presenter: FavoritePresenter
     let columns = [GridItem(.flexible()), GridItem(.flexible())]
     var body: some View {
-      ZStack {
-        if presenter.loadingState {
-          ProgressView()
-        } else if presenter.errorMessage != "" {
-          if presenter.favGames.isEmpty {
-            HStack {
-                Spacer()
-                Text("No Favorite Game")
-                    .padding(.top, 64)
-                Spacer()
-            }
-          } else {
-            favGameView
+      NavigationView {
+          ScrollView {
+              VStack(alignment: .leading) {
+                Label("Favorite Games", systemImage: "heart.circle.fill")
+                    .padding(.horizontal)
+                    .font(Font.title2.weight(.bold))
+                    .foregroundColor(Color("PrimaryColor"))
+                ZStack {
+                  VStack {
+                    Spacer()
+                    HStack(alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/) {
+                      Spacer()
+                      if self.presenter.loadingState {
+                        ProgressView()
+                      } else if presenter.errorMessage != "" {
+                        if presenter.favGames.isEmpty {
+                          HStack {
+                              Text("No Favorite Game")
+                                  .padding(.top, 64)
+                          }
+                        } else {
+                          favGameView
+                        }
+                      } else {
+                        Text(presenter.errorMessage)
+                      }
+                      Spacer()
+                    }
+                    Spacer()
+                  }
+                }
+                .onAppear {
+                  self.presenter.getFavGames()
+                }
+              }
           }
-        } else {
-          Text(presenter.errorMessage)
-        }
-      }
-      .onAppear {
-        self.presenter.getFavGames()
+          .navigationBarHidden(true)
+          .navigationBarTitle("", displayMode: .inline)
       }
     }
 }
 extension FavoriteView {
   var favGameView: some View {
-    NavigationView {
-        ScrollView {
-            VStack(alignment: .leading) {
-              Label("Favorite Games", systemImage: "heart.circle.fill")
-                  .padding(.horizontal)
-                  .font(Font.title2.weight(.bold))
-                  .foregroundColor(Color("PrimaryColor"))
-              LazyVGrid(columns: columns, alignment: .center) {
-                ForEach(presenter.favGames) { game in
-                  self.presenter.linkBuilder(for: game) {
-                      GameCardView(game: game)
-                          .padding()
-                          .frame(height: UIScreen.main.bounds.height/3)
-                  }
-                }
-              }
-            }
+    LazyVGrid(columns: columns, alignment: .center) {
+      ForEach(presenter.favGames) { game in
+        self.presenter.linkBuilder(for: game) {
+            GameCardView(game: game)
+                .padding()
+                .frame(height: UIScreen.main.bounds.height/3)
         }
-        .navigationBarHidden(true)
-        .navigationBarTitle("", displayMode: .inline)
+      }
     }
   }
 }
