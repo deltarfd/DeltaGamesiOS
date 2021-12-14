@@ -8,8 +8,8 @@
 import Foundation
 
 final class TrendingMapper {
-  static func mapGamesResponsesToTrendingEntities(
-    input gamesResponses: [GameResponse]
+  static func mapTrendingResponsesToEntities(
+    input gamesResponses: [TrendingResponse]
   ) -> [TrendingEntity] {
     return gamesResponses.map { result in
       let gameEntity = TrendingEntity()

@@ -10,6 +10,7 @@ import RealmSwift
 
 final class Injection: NSObject {
   
+  static let shared = Injection()
   private func provideRepository() -> GamesRepositoryProtocol {
     let realm = try? Realm()
 
@@ -18,7 +19,7 @@ final class Injection: NSObject {
 
     return GamesRepository.sharedInstance(locale, remote)
   }
-
+  
   func provideHome() -> HomeUseCase {
     let repository = provideRepository()
     return HomeInteractor(repository: repository)

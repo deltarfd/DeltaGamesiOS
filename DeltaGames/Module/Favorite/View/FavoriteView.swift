@@ -26,6 +26,8 @@ struct FavoriteView: View {
                       if self.presenter.loadingState {
                         ProgressView()
                       } else if presenter.errorMessage != "" {
+                        Text(presenter.errorMessage)
+                      } else {
                         if presenter.favGames.isEmpty {
                           HStack {
                               Text("No Favorite Game")
@@ -34,8 +36,6 @@ struct FavoriteView: View {
                         } else {
                           favGameView
                         }
-                      } else {
-                        Text(presenter.errorMessage)
                       }
                       Spacer()
                     }

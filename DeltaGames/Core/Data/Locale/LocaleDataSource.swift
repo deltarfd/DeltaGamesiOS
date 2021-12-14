@@ -14,8 +14,8 @@ protocol LocaleDataSourceProtocol: class {
   func addGames(from games: [GameEntity]) -> AnyPublisher<Bool, Error>
   func getTrending() -> AnyPublisher<[TrendingEntity], Error>
   func addTrending(from games: [TrendingEntity]) -> AnyPublisher<Bool, Error>
-  func getFavGames() -> AnyPublisher<[GameEntity], Error>
-  func addFavGame(from game: GameEntity) -> AnyPublisher<Bool, Error>
+  func getFavGames() -> AnyPublisher<[FavoriteEntity], Error>
+  func addFavGame(from game: FavoriteEntity) -> AnyPublisher<Bool, Error>
   func delFavGame(from id: String) -> AnyPublisher<Bool, Error>
   func isFavGame(from id: String) -> AnyPublisher<Bool, Error>
   
@@ -103,21 +103,21 @@ extension LocaleDataSource: LocaleDataSourceProtocol {
     }.eraseToAnyPublisher()
   }
   
-  func getFavGames() -> AnyPublisher<[GameEntity], Error> {
-    return Future<[GameEntity], Error> { result in
+  func getFavGames() -> AnyPublisher<[FavoriteEntity], Error> {
+    return Future<[FavoriteEntity], Error> { result in
         if let realm = self.realm {
-          let games: Results<GameEntity> = {
-              realm.objects(GameEntity.self)
+          let games: Results<FavoriteEntity> = {
+              realm.objects(FavoriteEntity.self)
                   .sorted(byKeyPath: "name", ascending: true)
           }()
-          result(.success(games.toArray(ofType: GameEntity.self)))
+          result(.success(games.toArray(ofType: FavoriteEntity.self)))
         } else {
           result(.failure(DatabaseError.invalidInstance))
         }
     }.eraseToAnyPublisher()
   }
   
-  func addFavGame(from game: GameEntity) -> AnyPublisher<Bool, Error> {
+  func addFavGame(from game: FavoriteEntity) -> AnyPublisher<Bool, Error> {
     return Future<Bool, Error> { result in
         if let realm = self.realm {
           do {
@@ -137,12 +137,12 @@ extension LocaleDataSource: LocaleDataSourceProtocol {
   func delFavGame(from id: String) -> AnyPublisher<Bool, Error> {
       return Future<Bool, Error> { result in
           if let realm = self.realm {
-              if let gameEntity = {
-                  realm.objects(GameEntity.self).filter("id = \(id)")
+              if let favoriteEntity = {
+                  realm.objects(FavoriteEntity.self).filter("id = \(id)")
               }().first {
                   do {
                       try realm.write {
-                        realm.delete(gameEntity)
+                        realm.delete(favoriteEntity)
                         result(.success(true))
                       }
                   } catch {
@@ -158,7 +158,7 @@ extension LocaleDataSource: LocaleDataSourceProtocol {
   func isFavGame(from id: String) -> AnyPublisher<Bool, Error> {
       return Future<Bool, Error> { result in
           if let realm = self.realm {
-            if realm.objects(GameEntity.self).filter("id = \(id)").first != nil {
+            if realm.objects(FavoriteEntity.self).filter("id = \(id)").first != nil {
               result(.success(true))
             } else {
               result(.success(false))

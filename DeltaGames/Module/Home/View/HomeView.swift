@@ -49,9 +49,9 @@ struct HomeView: View {
                       if self.presenter.loadingTrending {
                         ProgressView()
                       } else if presenter.errorMessage != "" {
-                        trendingGamesView
-                      } else {
                         Text(presenter.errorMessage)
+                      } else {
+                        trendingGamesView
                       }
                       Spacer()
                     }
@@ -75,9 +75,9 @@ struct HomeView: View {
                       if self.presenter.loadingGames {
                         ProgressView()
                       } else if presenter.errorMessage != "" {
-                        allGamesView
-                      } else {
                         Text(presenter.errorMessage)
+                      } else {
+                        allGamesView
                       }
                       Spacer()
                     }

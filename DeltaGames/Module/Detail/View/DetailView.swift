@@ -16,9 +16,9 @@ struct DetailView: View {
     if presenter.loadingState {
       ProgressView()
     } else if presenter.errorMessage != "" {
-      detailView
-    } else {
       Text(presenter.errorMessage)
+    } else {
+      detailView
     }
   }
 }
@@ -28,7 +28,7 @@ extension DetailView {
         ScrollView(.vertical) {
             VStack(alignment: .leading) {
                 ZStack(alignment: .topTrailing) {
-                  WebImage(url: URL(string: presenter.game.imageBackground != nil ? presenter.game.imageBackground ?? "" : "https://i.ibb.co/1GcrfqQ/img-error.png")!)
+                  WebImage(url: URL(string: presenter.game.imageBackground != nil ? presenter.game.imageBackground ?? "" : "https://i.ibb.co/1GcrfqQ/img-error.png"))
                     .resizable()
                     .indicator(Indicator {_, _ in ProgressView()})
                     .opacity(0.75)

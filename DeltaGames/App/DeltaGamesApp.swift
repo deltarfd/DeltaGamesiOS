@@ -9,17 +9,12 @@ import SwiftUI
 
 @main
 struct DeltaGamesApp: App {
+  @StateObject var homePresenter = HomePresenter(homeUseCase: Injection.shared.provideHome())
+  @StateObject var searchPresenter = SearchPresenter(searchUseCase: Injection.shared.provideSearch())
+  @StateObject var favoritePresenter = FavoritePresenter(favoriteUseCase: Injection.shared.provideFavorite())
+  @StateObject var profilePresenter = ProfilePresenter(profileUseCase: Injection.shared.provideProfile())
+  
     var body: some Scene {
-      let homeUseCase = Injection.init().provideHome()
-      let searchUseCase = Injection.init().provideSearch()
-      let favoriteUseCase = Injection.init().provideFavorite()
-      let profileUseCase = Injection.init().provideProfile()
-      
-      let homePresenter = HomePresenter(homeUseCase: homeUseCase)
-      let searchPresenter = SearchPresenter(searchUseCase: searchUseCase)
-      let favoritePresenter = FavoritePresenter(favoriteUseCase: favoriteUseCase)
-      let profilePresenter = ProfilePresenter(profileUseCase: profileUseCase)
-      
       WindowGroup {
         MainView()
           .environmentObject(homePresenter)

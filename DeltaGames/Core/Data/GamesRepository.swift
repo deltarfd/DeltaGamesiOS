@@ -66,7 +66,7 @@ extension GamesRepository: GamesRepositoryProtocol {
       .flatMap { result -> AnyPublisher<[GameModel], Error> in
         if result.isEmpty {
           return self.remote.getTrending(ordering: ordering, discover: discover)
-            .map { TrendingMapper.mapGamesResponsesToTrendingEntities(input: $0) }
+            .map { TrendingMapper.mapTrendingResponsesToEntities(input: $0) }
             .flatMap { self.locale.addTrending(from: $0) }
             .filter { $0 }
             .flatMap { _ in self.locale.getTrending()
@@ -74,8 +74,8 @@ extension GamesRepository: GamesRepositoryProtocol {
             }
             .eraseToAnyPublisher()
         } else {
-          return self.locale.getGames()
-            .map { GamesMapper.mapGamesEntitiesToDomains(input: $0) }
+          return self.locale.getTrending()
+            .map { TrendingMapper.mapTrendingEntitiesToDomains(input: $0) }
             .eraseToAnyPublisher()
         }
       }.eraseToAnyPublisher()
@@ -95,12 +95,12 @@ extension GamesRepository: GamesRepositoryProtocol {
   
   func getFavGames() -> AnyPublisher<[GameModel], Error> {
     return self.locale.getFavGames()
-      .map { GamesMapper.mapGamesEntitiesToDomains(input: $0) }
+      .map { FavoriteMapper.mapFavoriteEntitiesToDomains(input: $0) }
       .eraseToAnyPublisher()
   }
     
   func addFavGame(from game: GameModel) -> AnyPublisher<Bool, Error> {
-    let entity = GameMapper.mapGameDomainsToEntities(input: game)
+    let entity = FavoriteMapper.mapGameDomainsToEntities(input: game)
     return self.locale.addFavGame(from: entity)
         .eraseToAnyPublisher()
   }

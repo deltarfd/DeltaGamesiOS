@@ -12,7 +12,7 @@ import Combine
 protocol RemoteDataSourceProtocol: class {
 
   func getGames() -> AnyPublisher<[GameResponse], Error>
-  func getTrending(ordering: String, discover: String) -> AnyPublisher<[GameResponse], Error>
+  func getTrending(ordering: String, discover: String) -> AnyPublisher<[TrendingResponse], Error>
   func getDetailGame(from id: String) -> AnyPublisher<GameResponse, Error>
   func getSearchGames(search: String) -> AnyPublisher<[GameResponse], Error>
   
@@ -42,13 +42,13 @@ extension RemoteDataSource: RemoteDataSourceProtocol {
     }.eraseToAnyPublisher()
   }
   
-  func getTrending(ordering: String, discover: String) -> AnyPublisher<[GameResponse], Error> {
-    return Future<[GameResponse], Error> { result in
+  func getTrending(ordering: String, discover: String) -> AnyPublisher<[TrendingResponse], Error> {
+    return Future<[TrendingResponse], Error> { result in
       guard let url = URL(string: Endpoints.Gets.trending.url + "&ordering=\(ordering)&discover=\(discover)") else { return }
 
       AF.request(url)
         .validate()
-        .responseDecodable(of: ResultsGamesResponse.self) { response in
+        .responseDecodable(of: ResultsTrendingResponse.self) { response in
           switch response.result {
           case .success(let value): result(.success(value.results))
           case .failure: result(.failure(URLError.invalidResponse))
