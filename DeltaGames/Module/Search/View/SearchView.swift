@@ -24,7 +24,11 @@ struct SearchView: View {
                    .padding()
               ZStack {
                 if presenter.loadingState {
-                  ProgressView()
+                  HStack {
+                    Spacer()
+                    ProgressView()
+                    Spacer()
+                  }
                 } else if presenter.errorMessage != "" {
                   if presenter.searchGames.isEmpty {
                       HStack {

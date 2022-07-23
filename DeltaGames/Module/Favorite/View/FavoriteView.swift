@@ -21,7 +21,7 @@ struct FavoriteView: View {
                 ZStack {
                   VStack {
                     Spacer()
-                    HStack(alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/) {
+                    HStack(alignment: .center) {
                       Spacer()
                       if self.presenter.loadingState {
                         ProgressView()

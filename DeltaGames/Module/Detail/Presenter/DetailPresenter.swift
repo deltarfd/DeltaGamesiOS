@@ -14,12 +14,13 @@ class DetailPresenter: ObservableObject {
   
   @Published var game = GameModel()
   @Published var isFav: Bool = false
-  @Published var isDel: Bool = false
   @Published var errorMessage: String = ""
   @Published var loadingState: Bool = false
 
-  init(detailUseCase: DetailUseCase) {
+  init(id: String, detailUseCase: DetailUseCase) {
     self.detailUseCase = detailUseCase
+    getDetailGame(from: id)
+    isFavGame(from: id)
   }
   
   func getDetailGame(from id: String) {
@@ -84,8 +85,8 @@ class DetailPresenter: ObservableObject {
           case .finished:
             self.loadingState = false
           }
-        }, receiveValue: { isDel in
-          self.isDel = isDel
+        }, receiveValue: { _ in
+          self.isFav = false
         })
         .store(in: &cancellables)
   }
