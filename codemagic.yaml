@@ -1,6 +1,14 @@
 workflows:
   ios-release-pipeline:
     name: DeltaGames iOS Pipeline
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: "*"
+          include: true
+          source: true
+      cancel_previous_builds: true
     instance_type: mac_mini_m2
     environment:
       xcode: latest
