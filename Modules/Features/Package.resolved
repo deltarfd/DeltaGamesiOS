@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "deltagamesios-corecommon",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/deltarfd/DeltaGamesiOS-CoreCommon.git",
+      "state" : {
+        "revision" : "ae8e2d81b09e15e6e64feb56a40873edc45e0f07",
+        "version" : "1.0.0"
+      }
+    }
+  ],
+  "version" : 2
+}

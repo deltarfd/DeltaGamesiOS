@@ -16,14 +16,14 @@ let package = Package(
     .library(name: "ProfileFeature", targets: ["ProfileFeature"])
   ],
   dependencies: [
-    .package(path: "../CoreCommon")
+    .package(url: "https://github.com/deltarfd/DeltaGamesiOS-CoreCommon.git", from: "1.0.0")
   ],
   targets: [
-    .target(name: "HomeFeature", dependencies: ["CoreCommon"]),
-    .target(name: "DetailFeature", dependencies: ["CoreCommon"]),
-    .target(name: "FavoriteFeature", dependencies: ["CoreCommon"]),
-    .target(name: "SearchFeature", dependencies: ["CoreCommon"]),
-    .target(name: "ProfileFeature", dependencies: ["CoreCommon"]),
+    .target(name: "HomeFeature", dependencies: [.product(name: "CoreCommon", package: "deltagamesios-corecommon")]),
+    .target(name: "DetailFeature", dependencies: [.product(name: "CoreCommon", package: "deltagamesios-corecommon")]),
+    .target(name: "FavoriteFeature", dependencies: [.product(name: "CoreCommon", package: "deltagamesios-corecommon")]),
+    .target(name: "SearchFeature", dependencies: [.product(name: "CoreCommon", package: "deltagamesios-corecommon")]),
+    .target(name: "ProfileFeature", dependencies: [.product(name: "CoreCommon", package: "deltagamesios-corecommon")]),
     .testTarget(name: "HomeFeatureTests", dependencies: ["HomeFeature"]),
     .testTarget(name: "DetailFeatureTests", dependencies: ["DetailFeature"]),
     .testTarget(name: "FavoriteFeatureTests", dependencies: ["FavoriteFeature"]),
