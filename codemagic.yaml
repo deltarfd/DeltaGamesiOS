@@ -18,7 +18,7 @@ workflows:
           if ! command -v swiftlint >/dev/null 2>&1; then
             brew install swiftlint
           fi
-          swiftlint --config .swiftlint.yml --path DeltaGames
+          swiftlint lint --config .swiftlint.yml DeltaGames
       - name: Build iOS
         script: |
           export RAWG_API_KEY="$RAWG_API_KEY"

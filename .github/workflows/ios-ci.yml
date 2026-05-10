@@ -1,0 +1,70 @@
+name: iOS CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  lint-build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -switch /Applications/Xcode.app
+
+      - name: Install SwiftLint
+        run: brew install swiftlint
+
+      - name: Install CocoaPods
+        run: |
+          gem install cocoapods --no-document
+          pod install --repo-update
+
+      - name: Run SwiftLint
+        run: swiftlint lint --config .swiftlint.yml DeltaGames
+
+      - name: Build App
+        env:
+          RAWG_API_KEY: ${{ secrets.RAWG_API_KEY }}
+        run: |
+          xcodebuild \
+            -workspace DeltaGames.xcworkspace \
+            -scheme DeltaGames \
+            -destination 'generic/platform=iOS Simulator' \
+            -configuration Debug \
+            clean build
+
+      - name: Run CoreCommon Tests
+        env:
+          RAWG_API_KEY: ${{ secrets.RAWG_API_KEY }}
+        run: |
+          cd Modules/CoreCommon
+          swift test --enable-code-coverage
+
+      - name: Run Feature Modules Tests
+        env:
+          RAWG_API_KEY: ${{ secrets.RAWG_API_KEY }}
+        run: |
+          cd Modules/Features
+          swift test --enable-code-coverage
+
+      - name: Upload CoreCommon Coverage
+        uses: codecov/codecov-action@v4
+        with:
+          flags: corecommon
+          fail_ci_if_error: false
+          verbose: true
+          directory: Modules/CoreCommon/.build
+
+      - name: Upload Features Coverage
+        uses: codecov/codecov-action@v4
+        with:
+          flags: features
+          fail_ci_if_error: false
+          verbose: true
+          directory: Modules/Features/.build
