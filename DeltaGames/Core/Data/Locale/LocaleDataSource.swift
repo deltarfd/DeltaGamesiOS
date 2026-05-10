@@ -9,7 +9,7 @@ import Foundation
 import RealmSwift
 import Combine
 
-protocol LocaleDataSourceProtocol: class {
+protocol LocaleDataSourceProtocol: AnyObject {
   func getGames() -> AnyPublisher<[GameEntity], Error>
   func addGames(from games: [GameEntity]) -> AnyPublisher<Bool, Error>
   func getTrending() -> AnyPublisher<[TrendingEntity], Error>
@@ -148,6 +148,8 @@ extension LocaleDataSource: LocaleDataSourceProtocol {
                   } catch {
                     result(.failure(DatabaseError.requestFailed))
                   }
+              } else {
+                  result(.success(false))
               }
           } else {
             result(.failure(DatabaseError.invalidInstance))

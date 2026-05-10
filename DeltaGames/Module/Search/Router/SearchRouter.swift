@@ -7,12 +7,13 @@
 
 import SwiftUI
 
-class SearchRouter {
-
-  func makeDetailView(for game: GameModel) -> some View {
-    let detailUseCase = Injection.init().provideDetail(game: game)
-    let presenter = DetailPresenter(id: "\(game.id)", detailUseCase: detailUseCase)
-    return DetailView(presenter: presenter)
-  }
-  
+@MainActor
+final class SearchRouter {
+    func makeDetailView(for game: GameModel) -> some View {
+        return Group {
+          let detailUseCase = Injection.init().provideDetail(game: game)
+          let presenter = DetailPresenter(id: "\(game.id)", detailUseCase: detailUseCase)
+          DetailView(presenter: presenter)
+        }
+    }
 }

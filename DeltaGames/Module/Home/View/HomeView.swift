@@ -10,10 +10,11 @@ import SwiftUI
 struct HomeView: View {
     let rows = [GridItem(.flexible())]
     let columns = [GridItem(.flexible()), GridItem(.flexible())]
+    @State private var hasInitialized = false
     @ObservedObject var presenter: HomePresenter
  
     var body: some View {
-      NavigationView {
+      AppNavigationContainer {
           ScrollView {
               VStack(alignment: .leading) {
                 HStack {
@@ -27,10 +28,10 @@ struct HomeView: View {
                         }
                         Text("Let's Explore The Games!")
                             .font(.title3)
-                            .foregroundColor(Color("PrimaryColor"))
+                          .foregroundColor(.appPrimary)
                     }
                     Spacer()
-                    Image("deltarfd")
+                    Image(String.Asset.deltaRfd.rawValue)
                         .resizable()
                         .scaledToFit()
                         .clipShape(Circle())
@@ -40,7 +41,7 @@ struct HomeView: View {
                 Label("New & Trending", systemImage: "flame")
                     .padding(.horizontal)
                     .font(Font.title2.weight(.bold))
-                    .foregroundColor(Color("PrimaryColor"))
+                  .foregroundColor(.appPrimary)
                 ZStack {
                   VStack {
                     Spacer()
@@ -58,15 +59,10 @@ struct HomeView: View {
                     Spacer()
                   }
                 }
-                .onAppear {
-                  if self.presenter.trending.count == 0 {
-                    self.presenter.getTrending(ordering: "-relevance", discover: "true")
-                  }
-                }
                 Label("Explore Games", systemImage: "gamecontroller")
                     .padding(.horizontal)
                     .font(Font.title2.weight(.bold))
-                    .foregroundColor(Color("PrimaryColor"))
+                  .foregroundColor(.appPrimary)
                 ZStack {
                   VStack {
                     Spacer()
@@ -84,12 +80,14 @@ struct HomeView: View {
                     Spacer()
                   }
                 }
-                .onAppear {
-                  if self.presenter.games.count == 0 {
-                    self.presenter.getGames()
-                  }
-                }
               }.padding(.vertical)
+          }
+          .onAppear {
+            guard !hasInitialized else { return }
+            hasInitialized = true
+            DispatchQueue.main.async {
+              presenter.loadIfNeeded()
+            }
           }
           .navigationBarHidden(true)
           .navigationBarTitle("", displayMode: .inline)
@@ -101,13 +99,11 @@ extension HomeView {
     ScrollView(.horizontal, showsIndicators: false) {
         LazyHGrid(rows: rows, alignment: .center) {
           ForEach(self.presenter.trending, id: \.id) { trending in
-            ZStack {
-              self.presenter.linkBuilder(for: trending) {
-                GameCardView(game: trending)
-                    .padding()
-                    .frame(width: UIScreen.main.bounds.width)
-              }.buttonStyle(PlainButtonStyle())
-            }.padding(8)
+            self.presenter.linkBuilder(for: trending) {
+              GameCardView(game: trending)
+                  .padding()
+                  .frame(width: UIScreen.main.bounds.width)
+            }.buttonStyle(PlainButtonStyle())
           }
         }
     }.frame(height: UIScreen.main.bounds.height/3)
@@ -116,13 +112,11 @@ extension HomeView {
   var allGamesView: some View {
     LazyVGrid(columns: columns, alignment: .center) {
       ForEach(self.presenter.games) { game in
-        ZStack {
-          self.presenter.linkBuilder(for: game) {
-            GameCardView(game: game)
-                .padding()
-                .frame(height: UIScreen.main.bounds.height/3)
-          }.buttonStyle(PlainButtonStyle())
-        }.padding(8)
+        self.presenter.linkBuilder(for: game) {
+          GameCardView(game: game)
+              .padding()
+              .frame(height: UIScreen.main.bounds.height/3)
+        }.buttonStyle(PlainButtonStyle())
         }
     }
   }

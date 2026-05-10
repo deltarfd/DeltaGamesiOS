@@ -7,7 +7,8 @@
 
 import SwiftUI
 
-class ProfilePresenter: ObservableObject {
+@MainActor
+final class ProfilePresenter: ObservableObject {
 
   private let profileUseCase: ProfileUseCase
   

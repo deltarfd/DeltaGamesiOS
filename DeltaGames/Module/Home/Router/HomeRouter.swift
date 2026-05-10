@@ -7,12 +7,15 @@
 
 import SwiftUI
 
-class HomeRouter {
+@MainActor
+final class HomeRouter {
 
   func makeDetailView(for game: GameModel) -> some View {
-    let detailUseCase = Injection.init().provideDetail(game: game)
-    let presenter = DetailPresenter(id: "\(game.id)", detailUseCase: detailUseCase)
-    return DetailView(presenter: presenter)
+    return Group {
+      let detailUseCase = Injection.init().provideDetail(game: game)
+      let presenter = DetailPresenter(id: "\(game.id)", detailUseCase: detailUseCase)
+      DetailView(presenter: presenter)
+    }
   }
   
 }

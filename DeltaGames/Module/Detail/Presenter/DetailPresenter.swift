@@ -8,9 +8,18 @@
 import SwiftUI
 import Combine
 
-class DetailPresenter: ObservableObject {
+struct FavoriteChange {
+  let game: GameModel
+  let isFavorite: Bool
+}
+
+@MainActor
+final class DetailPresenter: ObservableObject {
   private var cancellables: Set<AnyCancellable> = []
   private let detailUseCase: DetailUseCase
+  private let id: String
+  private var hasLoaded = false
+  private var favoriteChange: FavoriteChange?
   
   @Published var game = GameModel()
   @Published var isFav: Bool = false
@@ -18,76 +27,94 @@ class DetailPresenter: ObservableObject {
   @Published var loadingState: Bool = false
 
   init(id: String, detailUseCase: DetailUseCase) {
+    self.id = id
     self.detailUseCase = detailUseCase
+  }
+
+  var pendingFavoriteChange: FavoriteChange? {
+    favoriteChange
+  }
+
+  func loadIfNeeded() {
+    guard !hasLoaded else { return }
+    hasLoaded = true
     getDetailGame(from: id)
     isFavGame(from: id)
   }
   
   func getDetailGame(from id: String) {
+    errorMessage = ""
     loadingState = true
     detailUseCase.getDetailGame(from: id)
-      .receive(on: RunLoop.main)
-      .sink(receiveCompletion: { completion in
-          switch completion {
-          case .failure:
-            self.errorMessage = String(describing: completion)
-          case .finished:
-            self.loadingState = false
+      .receive(on: DispatchQueue.main)
+      .sink(
+        receiveCompletion: { [weak self] completion in
+          guard let self else { return }
+          self.loadingState = false
+          if case .failure(let error) = completion {
+            self.errorMessage = error.localizedDescription
           }
-        }, receiveValue: { game in
-          self.game = game
-        })
+        },
+        receiveValue: { [weak self] game in
+          self?.game = game
+        }
+      )
         .store(in: &cancellables)
   }
   
   func isFavGame(from id: String) {
-    loadingState = true
     detailUseCase.isFavGame(from: id)
-      .receive(on: RunLoop.main)
-      .sink(receiveCompletion: { completion in
-          switch completion {
-          case .failure:
-            self.errorMessage = String(describing: completion)
-          case .finished:
-            self.loadingState = false
+      .receive(on: DispatchQueue.main)
+      .sink(
+        receiveCompletion: { [weak self] completion in
+          if case .failure(let error) = completion {
+            self?.errorMessage = error.localizedDescription
           }
-        }, receiveValue: { isFavGame in
-          self.isFav = isFavGame
-        })
+        },
+        receiveValue: { [weak self] isFavGame in
+          self?.isFav = isFavGame
+        }
+      )
         .store(in: &cancellables)
   }
   
   func addFavGame(from id: GameModel) {
-    loadingState = true
+    errorMessage = ""
     detailUseCase.addFavGame(from: id)
-      .receive(on: RunLoop.main)
-      .sink(receiveCompletion: { completion in
-          switch completion {
-          case .failure:
-            self.errorMessage = String(describing: completion)
-          case .finished:
-            self.loadingState = false
+      .receive(on: DispatchQueue.main)
+      .sink(
+        receiveCompletion: { [weak self] completion in
+          if case .failure(let error) = completion {
+            self?.errorMessage = error.localizedDescription
           }
-        }, receiveValue: { isFavGame in
-          self.isFav = isFavGame
-        })
+        },
+        receiveValue: { [weak self] isFavGame in
+          self?.isFav = isFavGame
+          guard let self, isFavGame else { return }
+          self.favoriteChange = FavoriteChange(game: self.game, isFavorite: true)
+          NotificationCenter.default.post(name: .favoritesDidChange, object: nil)
+        }
+      )
         .store(in: &cancellables)
   }
   
   func delFavGame(from id: String) {
-    loadingState = true
+    errorMessage = ""
     detailUseCase.delFavGame(from: id)
-      .receive(on: RunLoop.main)
-      .sink(receiveCompletion: { completion in
-          switch completion {
-          case .failure:
-            self.errorMessage = String(describing: completion)
-          case .finished:
-            self.loadingState = false
+      .receive(on: DispatchQueue.main)
+      .sink(
+        receiveCompletion: { [weak self] completion in
+          if case .failure(let error) = completion {
+            self?.errorMessage = error.localizedDescription
           }
-        }, receiveValue: { _ in
+        },
+        receiveValue: { [weak self] _ in
+          guard let self else { return }
           self.isFav = false
-        })
+          self.favoriteChange = FavoriteChange(game: self.game, isFavorite: false)
+          NotificationCenter.default.post(name: .favoritesDidChange, object: nil)
+        }
+      )
         .store(in: &cancellables)
   }
 

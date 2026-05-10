@@ -12,7 +12,6 @@ struct DeltaGamesApp: App {
   @StateObject var homePresenter = HomePresenter(homeUseCase: Injection.shared.provideHome())
   @StateObject var searchPresenter = SearchPresenter(searchUseCase: Injection.shared.provideSearch())
   @StateObject var favoritePresenter = FavoritePresenter(favoriteUseCase: Injection.shared.provideFavorite())
-  @StateObject var profilePresenter = ProfilePresenter(profileUseCase: Injection.shared.provideProfile())
   
     var body: some Scene {
       WindowGroup {
@@ -20,7 +19,6 @@ struct DeltaGamesApp: App {
           .environmentObject(homePresenter)
           .environmentObject(searchPresenter)
           .environmentObject(favoritePresenter)
-          .environmentObject(profilePresenter)
       }
       
     }

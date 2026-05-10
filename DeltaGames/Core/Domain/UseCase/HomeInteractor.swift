@@ -12,7 +12,7 @@ protocol HomeUseCase {
   func getTrending(ordering: String, discover: String) -> AnyPublisher<[GameModel], Error>
 }
 
-class HomeInteractor: HomeUseCase {
+final class HomeInteractor: HomeUseCase {
 
   private let repository: GamesRepositoryProtocol
   
@@ -21,11 +21,11 @@ class HomeInteractor: HomeUseCase {
   }
   
   func getGames() -> AnyPublisher<[GameModel], Error> {
-    return repository.getGames()
+    repository.getGames()
   }
   
   func getTrending(ordering: String, discover: String) -> AnyPublisher<[GameModel], Error> {
-    return repository.getTrending(ordering: ordering, discover: discover)
+    repository.getTrending(ordering: ordering, discover: discover)
   }
 
 }

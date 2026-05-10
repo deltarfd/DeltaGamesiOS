@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import SDWebImageSwiftUI
 
 struct GameCardView: View {
   public init(game: GameModel) {
@@ -18,7 +17,7 @@ struct GameCardView: View {
   var body: some View {
     VStack(alignment: .leading) {
         HStack {
-            Text("⭐️ \(String(format: "%.2f", game.rating ?? 0.0))/5")
+            Text("⭐️ \(game.rating.formattedRating())")
                 .font(Font.caption.weight(.bold))
                 .foregroundColor(.primary)
             Spacer()
@@ -32,18 +31,25 @@ struct GameCardView: View {
             .fontWeight(.black)
             .foregroundColor(.primary)
             .lineLimit(2)
-      Text(game.parentPlatforms != nil ? game.parentPlatforms!.reduce("", { $0 + "\($1.platform.name), " }) : "")
+      Text((game.parentPlatforms ?? []).map { $0.platform.name }.joined(separator: ", "))
             .font(.subheadline)
             .foregroundColor(.secondary)
             .lineLimit(2)
     }.padding()
         .background(
-          WebImage(url: URL(string: game.imageBackground != nil ? game.imageBackground! : "https://i.ibb.co/1GcrfqQ/img-error.png"))
-                .resizable()
-                .indicator(Indicator {_, _ in ProgressView()})
-                .scaledToFill()
-                .opacity(0.75))
+          RemoteImageView(
+            url: URL(string: game.imageBackground ?? "https://i.ibb.co/1GcrfqQ/img-error.png"),
+            contentMode: .fill
+          ) {
+            ZStack {
+              Color(.systemGray5)
+              ProgressView()
+            }
+          }
+          .opacity(0.75))
+        .clipped()
         .cornerRadius(24)
+        .contentShape(Rectangle())
   }
     
 }

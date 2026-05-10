@@ -11,9 +11,9 @@ struct TagsResponse: Identifiable, Codable {
     let id: Int
     let slug: String
     let name: String
-    let language: String
-    let gamesCount: Int
-    let imageBackground: String
+    let language: String?
+    let gamesCount: Int?
+    let imageBackground: String?
     enum CodingKeys: String, CodingKey {
         case id
         case slug

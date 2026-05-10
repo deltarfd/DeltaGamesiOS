@@ -6,19 +6,39 @@
 //
 
 import SwiftUI
-import SDWebImageSwiftUI
 
 struct DetailView: View {
-  @ObservedObject var presenter: DetailPresenter
+  @StateObject var presenter: DetailPresenter
+  @State private var hasInitialized = false
+  private let onDismiss: ((FavoriteChange?) -> Void)?
+
+  init(presenter: DetailPresenter, onDismiss: ((FavoriteChange?) -> Void)? = nil) {
+    _presenter = StateObject(wrappedValue: presenter)
+    self.onDismiss = onDismiss
+  }
 
   var body: some View {
-    
-    if presenter.loadingState {
-      ProgressView()
-    } else if presenter.errorMessage != "" {
-      Text(presenter.errorMessage)
-    } else {
-      detailView
+    Group {
+      if presenter.loadingState {
+        ProgressView()
+      } else if presenter.errorMessage != "" {
+        Text(presenter.errorMessage)
+      } else {
+        detailView
+      }
+    }
+    .onAppear {
+      if !hasInitialized {
+        hasInitialized = true
+        DispatchQueue.main.async {
+          presenter.loadIfNeeded()
+        }
+      }
+    }
+    .onDisappear {
+      DispatchQueue.main.async {
+        onDismiss?(presenter.pendingFavoriteChange)
+      }
     }
   }
 }
@@ -28,11 +48,16 @@ extension DetailView {
         ScrollView(.vertical) {
             VStack(alignment: .leading) {
                 ZStack(alignment: .topTrailing) {
-                  WebImage(url: URL(string: presenter.game.imageBackground != nil ? presenter.game.imageBackground ?? "" : "https://i.ibb.co/1GcrfqQ/img-error.png"))
-                    .resizable()
-                    .indicator(Indicator {_, _ in ProgressView()})
+                  RemoteImageView(
+                    url: URL(string: presenter.game.imageBackground ?? "https://i.ibb.co/1GcrfqQ/img-error.png"),
+                    contentMode: .fill
+                  ) {
+                    ZStack {
+                      Color(.systemGray5)
+                      ProgressView()
+                    }
+                  }
                     .opacity(0.75)
-                    .scaledToFill()
                     .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height / 3)
                     .clipped()
                     Button {
@@ -44,10 +69,10 @@ extension DetailView {
                                                                name: presenter.game.name,
                                                                description: presenter.game.description,
                                                                released: presenter.game.released ?? "-",
-                                                               imageBackground: presenter.game.imageBackground != nil ? presenter.game.imageBackground ?? "" : "https://i.ibb.co/1GcrfqQ/img-error.png",
-                                                               rating: presenter.game.rating!,
-                                                               ratingTop: presenter.game.ratingTop!,
-                                                               ratingsCount: presenter.game.ratingsCount!,
+                                                               imageBackground: presenter.game.imageBackground ?? "https://i.ibb.co/1GcrfqQ/img-error.png",
+                                                               rating: presenter.game.rating ?? 0.0,
+                                                               ratingTop: presenter.game.ratingTop ?? 0,
+                                                               ratingsCount: presenter.game.ratingsCount ?? 0,
                                                                genres: presenter.game.genres,
                                                                parentPlatforms: presenter.game.parentPlatforms,
                                                                tags: presenter.game.tags
@@ -65,31 +90,31 @@ extension DetailView {
                         .font(Font.title2.weight(.bold))
                         .lineLimit(2)
                     Spacer(minLength: 10)
-                    Label("\(String(format: "%.2f", presenter.game.rating ?? 0.0))/5", systemImage: "star.fill")
+                    Label(presenter.game.rating.formattedRating(), systemImage: String.SFSymbol.starFill.rawValue)
                         .padding(.horizontal)
                         .font(Font.headline.weight(.bold))
-                        .foregroundColor(Color("PrimaryColor"))
+                        .foregroundColor(.primary)
                 }
                 Text("Released: \(presenter.game.released ?? "-")")
                     .padding(.horizontal)
                     .font(.caption)
-                    .foregroundColor(Color("PrimaryColor"))
-              Text(presenter.game.parentPlatforms!.reduce("", { $0 + "\($1.platform.name), " }))
+                  .foregroundColor(.appPrimary)
+                Text((presenter.game.parentPlatforms ?? []).map { $0.platform.name }.joined(separator: ", "))
                     .padding(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
                     .font(.headline)
                     .foregroundColor(Color.gray)
-                Text(presenter.game.genres!.reduce("", { $0 + "\($1.name), " }))
+                Text((presenter.game.genres ?? []).map { $0.name }.joined(separator: ", "))
                     .padding(.horizontal)
                     .font(.headline)
-                    .foregroundColor(Color("PrimaryColor"))
-                Text("Tags: " + presenter.game.tags!.reduce("", { $0 + "\($1.name), " }))
+                  .foregroundColor(.appPrimary)
+                Text("Tags: " + (presenter.game.tags ?? []).map { $0.name }.joined(separator: ", "))
                     .padding(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
                     .font(.headline)
                 Text("Description")
                     .padding(.horizontal)
                     .font(.headline)
-                    .foregroundColor(Color("PrimaryColor"))
-                Text(removeHTML(string: presenter.game.description!))
+                  .foregroundColor(.appPrimary)
+                Text(removeHTML(string: presenter.game.description ?? ""))
                     .padding(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
                     .font(.headline)
                 Spacer()

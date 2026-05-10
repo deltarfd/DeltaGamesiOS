@@ -8,10 +8,12 @@
 import SwiftUI
 import Combine
 
-class HomePresenter: ObservableObject {
+@MainActor
+final class HomePresenter: ObservableObject {
   private var cancellables: Set<AnyCancellable> = []
   private let router = HomeRouter()
   private let homeUseCase: HomeUseCase
+  private var hasLoaded = false
   
   @Published var trending: [GameModel] = []
   @Published var games: [GameModel] = []
@@ -22,38 +24,56 @@ class HomePresenter: ObservableObject {
   init(homeUseCase: HomeUseCase) {
     self.homeUseCase = homeUseCase
   }
+
+  func loadIfNeeded() {
+    guard !hasLoaded else { return }
+    hasLoaded = true
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) { [weak self] in
+      guard let self else { return }
+      self.getTrending(ordering: "-relevance", discover: "true")
+      self.getGames()
+    }
+  }
   
   func getGames() {
+    guard !loadingGames else { return }
+    errorMessage = ""
     loadingGames = true
     homeUseCase.getGames()
-      .receive(on: RunLoop.main)
-      .sink(receiveCompletion: { completion in
-          switch completion {
-          case .failure:
-            self.errorMessage = String(describing: completion)
-          case .finished:
-            self.loadingGames = false
+      .receive(on: DispatchQueue.main)
+      .sink(
+        receiveCompletion: { [weak self] completion in
+          guard let self else { return }
+          self.loadingGames = false
+          if case .failure(let error) = completion {
+            self.errorMessage = error.localizedDescription
           }
-        }, receiveValue: { games in
-          self.games = games
-        })
+        },
+        receiveValue: { [weak self] games in
+          self?.games = games
+        }
+      )
         .store(in: &cancellables)
   }
   
   func getTrending(ordering: String, discover: String) {
+    guard !loadingTrending else { return }
+    errorMessage = ""
     loadingTrending = true
     homeUseCase.getTrending(ordering: ordering, discover: discover)
-      .receive(on: RunLoop.main)
-      .sink(receiveCompletion: { completion in
-          switch completion {
-          case .failure:
-            self.errorMessage = String(describing: completion)
-          case .finished:
-            self.loadingTrending = false
+      .receive(on: DispatchQueue.main)
+      .sink(
+        receiveCompletion: { [weak self] completion in
+          guard let self else { return }
+          self.loadingTrending = false
+          if case .failure(let error) = completion {
+            self.errorMessage = error.localizedDescription
           }
-        }, receiveValue: { trending in
-          self.trending = trending
-        })
+        },
+        receiveValue: { [weak self] trending in
+          self?.trending = trending
+        }
+      )
         .store(in: &cancellables)
   }
 
@@ -62,7 +82,8 @@ class HomePresenter: ObservableObject {
     @ViewBuilder detailView: () -> Content
   ) -> some View {
     NavigationLink(
-    destination: router.makeDetailView(for: game)) { detailView() }
+      destination: LazyView(self.router.makeDetailView(for: game))
+    ) { detailView() }
   }
 
 }

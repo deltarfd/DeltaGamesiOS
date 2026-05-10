@@ -13,12 +13,12 @@ struct ProfileView: View {
     @State var isEditing = false
     var body: some View {
         ZStack(alignment: .top) {
-            Image("bg_profile")
+            Image(String.Asset.bgProfile.rawValue)
                 .resizable()
                 .scaledToFill()
                 .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height / 3)
             VStack(spacing: 15) {
-                Image("deltarfd")
+                Image(String.Asset.deltaRfd.rawValue)
                     .resizable()
                     .scaledToFit()
                     .clipShape(Circle())
@@ -30,8 +30,8 @@ struct ProfileView: View {
                     .font(Font.title.weight(.heavy))
                     .multilineTextAlignment(.center)
                     .padding()
-                    .foregroundColor(Color("PrimaryColor"))
-                Text("Bergabung sejak 19 Sep 2017")
+                    .foregroundColor(.appPrimary)
+                Text(String.UIString.joinedDate)
                     .font(.subheadline)
                     .foregroundColor(Color.gray)
                 TextField("Caption", text: $caption)
@@ -55,7 +55,7 @@ struct ProfileView: View {
                         .frame(width: UIScreen.main.bounds.width/2)
                         .padding()
                 }
-                .background(Color("PrimaryColor"))
+                .background(Color.appPrimary)
                 .clipShape(Capsule())
                 .padding(.top, 64)
                 Spacer()

@@ -9,11 +9,10 @@ import SwiftUI
 
 struct MainView: View {
 
-  @State var selection = 0
+    @State private var selection = 0
   @EnvironmentObject var homePresenter: HomePresenter
   @EnvironmentObject var searchPresenter: SearchPresenter
   @EnvironmentObject var favoritePresenter: FavoritePresenter
-  @EnvironmentObject var profilePresenter: ProfilePresenter
   
     var body: some View {
         TabView(selection: $selection) {

@@ -8,7 +8,8 @@
 import SwiftUI
 import Combine
 
-class SearchPresenter: ObservableObject {
+@MainActor
+final class SearchPresenter: ObservableObject {
   private var cancellables: Set<AnyCancellable> = []
   private let router = SearchRouter()
   private let searchUseCase: SearchUseCase
@@ -20,21 +21,57 @@ class SearchPresenter: ObservableObject {
   init(searchUseCase: SearchUseCase) {
     self.searchUseCase = searchUseCase
   }
+
+  func resetSearch() {
+    errorMessage = ""
+    loadingState = false
+    searchGames = []
+  }
+  
+  func loadInitialGames() {
+    errorMessage = ""
+    loadingState = true
+    cancellables.removeAll()
+    searchUseCase.getSearchGames(search: "")
+      .receive(on: DispatchQueue.main)
+      .sink(
+        receiveCompletion: { [weak self] completion in
+          guard let self else { return }
+          self.loadingState = false
+          if case .failure(let error) = completion {
+            self.errorMessage = error.localizedDescription
+          }
+        },
+        receiveValue: { [weak self] games in
+          self?.searchGames = games
+        }
+      )
+        .store(in: &cancellables)
+  }
   
   func getSearchGames(search: String) {
+    let query = search.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard !query.isEmpty else {
+      loadInitialGames()
+      return
+    }
+    errorMessage = ""
     loadingState = true
-    searchUseCase.getSearchGames(search: search)
-      .receive(on: RunLoop.main)
-      .sink(receiveCompletion: { completion in
-          switch completion {
-          case .failure:
-            self.errorMessage = String(describing: completion)
-          case .finished:
-            self.loadingState = false
+    cancellables.removeAll()
+    searchUseCase.getSearchGames(search: query)
+      .receive(on: DispatchQueue.main)
+      .sink(
+        receiveCompletion: { [weak self] completion in
+          guard let self else { return }
+          self.loadingState = false
+          if case .failure(let error) = completion {
+            self.errorMessage = error.localizedDescription
           }
-        }, receiveValue: { games in
-          self.searchGames = games
-        })
+        },
+        receiveValue: { [weak self] games in
+          self?.searchGames = games
+        }
+      )
         .store(in: &cancellables)
   }
   
@@ -43,7 +80,8 @@ class SearchPresenter: ObservableObject {
     @ViewBuilder content: () -> Content
   ) -> some View {
     NavigationLink(
-    destination: router.makeDetailView(for: game)) { content() }
+      destination: LazyView(self.router.makeDetailView(for: game))
+    ) { content() }
   }
 
 }

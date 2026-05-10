@@ -17,9 +17,9 @@ final class TagsMapper {
         id: result.id,
         slug: result.slug,
         name: result.name,
-        language: result.language,
-        gamesCount: result.gamesCount,
-        imageBackground: result.imageBackground
+        language: result.language ?? "",
+        gamesCount: result.gamesCount ?? 0,
+        imageBackground: result.imageBackground ?? ""
       )
     }
   }

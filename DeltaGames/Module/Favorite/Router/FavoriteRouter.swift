@@ -7,12 +7,15 @@
 
 import SwiftUI
 
-class FavoriteRouter {
+@MainActor
+final class FavoriteRouter {
 
-  func makeDetailView(for game: GameModel) -> some View {
-    let detailUseCase = Injection.init().provideDetail(game: game)
-    let presenter = DetailPresenter(id: "\(game.id)", detailUseCase: detailUseCase)
-    return DetailView(presenter: presenter)
+  func makeDetailView(for game: GameModel, onDismiss: ((FavoriteChange?) -> Void)? = nil) -> some View {
+    return Group {
+      let detailUseCase = Injection.init().provideDetail(game: game)
+      let presenter = DetailPresenter(id: "\(game.id)", detailUseCase: detailUseCase)
+      DetailView(presenter: presenter, onDismiss: onDismiss)
+    }
   }
   
 }

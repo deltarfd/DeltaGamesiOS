@@ -1,0 +1,43 @@
+workflows:
+  ios-release-pipeline:
+    name: DeltaGames iOS Pipeline
+    instance_type: mac_mini_m2
+    environment:
+      xcode: latest
+      cocoapods: default
+      vars:
+        # API key is managed via Codemagic environment variable
+        # Set RAWG_API_KEY in Codemagic dashboard > Project Settings > Environment variables
+        RAWG_API_KEY: $RAWG_API_KEY
+    scripts:
+      - name: Install Pods
+        script: |
+          pod install --repo-update
+      - name: Lint
+        script: |
+          if ! command -v swiftlint >/dev/null 2>&1; then
+            brew install swiftlint
+          fi
+          swiftlint --config .swiftlint.yml --path DeltaGames
+      - name: Build iOS
+        script: |
+          export RAWG_API_KEY="$RAWG_API_KEY"
+          xcodebuild \
+            -workspace DeltaGames.xcworkspace \
+            -scheme DeltaGames \
+            -destination 'generic/platform=iOS Simulator' \
+            -configuration Release \
+            clean build
+      - name: Test CoreCommon Package
+        script: |
+          export RAWG_API_KEY="$RAWG_API_KEY"
+          cd Modules/CoreCommon
+          swift test
+      - name: Test Feature Modules Package
+        script: |
+          export RAWG_API_KEY="$RAWG_API_KEY"
+          cd Modules/Features
+          swift test
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log

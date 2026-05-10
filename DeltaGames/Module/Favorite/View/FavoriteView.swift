@@ -11,13 +11,13 @@ struct FavoriteView: View {
     @ObservedObject var presenter: FavoritePresenter
     let columns = [GridItem(.flexible()), GridItem(.flexible())]
     var body: some View {
-      NavigationView {
+    AppNavigationContainer {
           ScrollView {
               VStack(alignment: .leading) {
                 Label("Favorite Games", systemImage: "heart.circle.fill")
                     .padding(.horizontal)
                     .font(Font.title2.weight(.bold))
-                    .foregroundColor(Color("PrimaryColor"))
+                  .foregroundColor(.appPrimary)
                 ZStack {
                   VStack {
                     Spacer()
@@ -42,13 +42,15 @@ struct FavoriteView: View {
                     Spacer()
                   }
                 }
-                .onAppear {
-                  self.presenter.getFavGames()
-                }
               }
           }
           .navigationBarHidden(true)
           .navigationBarTitle("", displayMode: .inline)
+      }
+      .onAppear {
+        DispatchQueue.main.async {
+          presenter.handleAppear()
+        }
       }
     }
 }
@@ -60,7 +62,7 @@ extension FavoriteView {
             GameCardView(game: game)
                 .padding()
                 .frame(height: UIScreen.main.bounds.height/3)
-        }
+        }.buttonStyle(PlainButtonStyle())
       }
     }
   }
