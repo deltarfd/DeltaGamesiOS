@@ -7,10 +7,11 @@
  */
 
 import SwiftUI
+import Combine
 import SDWebImage
 
 /// A Image observable object for handle aniamted image playback. This is used to avoid `@State` update may capture the View struct type and cause memory leak.
-@available(iOS 13.0, OSX 10.15, tvOS 13.0, watchOS 6.0, *)
+@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 public final class ImagePlayer : ObservableObject {
     var player: SDAnimatedImagePlayer?
     
@@ -31,7 +32,6 @@ public final class ImagePlayer : ObservableObject {
     
     deinit {
         player?.stopPlaying()
-        currentFrame = nil
     }
     
     /// Current playing frame image
@@ -42,6 +42,8 @@ public final class ImagePlayer : ObservableObject {
     
     /// Current playing loop count
     @Published public var currentLoopCount: UInt = 0
+    
+    var currentAnimatedImage: (PlatformImage & SDAnimatedImageProvider)?
     
     /// Whether current player is valid for playing. This will check the internal player exist or not
     public var isValid: Bool {
@@ -81,17 +83,28 @@ public final class ImagePlayer : ObservableObject {
     /// Setup the player using Animated Image.
     /// After setup, you can always check `isValid` status, or call `startPlaying` to play the animation.
     /// - Parameter image: animated image
-    public func setupPlayer(animatedImage: SDAnimatedImageProvider) {
+    public func setupPlayer(animatedImage: PlatformImage & SDAnimatedImageProvider) {
         if isValid {
             return
         }
+        currentAnimatedImage = animatedImage
         if let imagePlayer = SDAnimatedImagePlayer(provider: animatedImage) {
             imagePlayer.animationFrameHandler = { [weak self] (index, frame) in
-                self?.currentFrameIndex = index
-                self?.currentFrame = frame
+                guard let self = self else {
+                    return
+                }
+                if (self.isPlaying) {
+                    self.currentFrameIndex = index
+                    self.currentFrame = frame
+                }
             }
             imagePlayer.animationLoopHandler = { [weak self] (loopCount) in
-                self?.currentLoopCount = loopCount
+                guard let self = self else {
+                    return
+                }
+                if (self.isPlaying) {
+                    self.currentLoopCount = loopCount
+                }
             }
             // Setup configuration
             if let maxBufferSize = maxBufferSize {

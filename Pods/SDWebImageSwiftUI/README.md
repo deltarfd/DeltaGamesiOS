@@ -8,6 +8,8 @@
 [![SwiftPM compatible](https://img.shields.io/badge/SwiftPM-compatible-brightgreen.svg)](https://swift.org/package-manager/)
 [![codecov](https://codecov.io/gh/SDWebImage/SDWebImageSwiftUI/branch/master/graph/badge.svg)](https://codecov.io/gh/SDWebImage/SDWebImageSwiftUI)
 
+> If you support iOS 15+/macOS 12+ only and don't care about animated image format, try SwiftUI's [AsyncImage](https://developer.apple.com/documentation/swiftui/asyncimage)
+
 ## What's for
 
 SDWebImageSwiftUI is a SwiftUI image loading framework, which based on [SDWebImage](https://github.com/SDWebImage/SDWebImage).
@@ -15,6 +17,20 @@ SDWebImageSwiftUI is a SwiftUI image loading framework, which based on [SDWebIma
 It brings all your favorite features from SDWebImage, like async image loading, memory/disk caching, animated image playback and performances.
 
 The framework provide the different View structs, which API match the SwiftUI framework guideline. If you're familiar with `Image`, you'll find it easy to use `WebImage` and `AnimatedImage`.
+
+## Apple VisionOS
+
+From v3.0.0, SDWebImageSwiftUI can be compiled for visionOS platform. However, due to the lacking package manager support (need tools update), we don't support CocoaPods/SPM yet.
+
+You can only use the Xcode's built-in package manager dependency to build on visionOS.
+
+To run the visionOS example, you need to clone and add both `SDWebImage` and `SDWebImageSwiftUI`, open the `SDWebImageSwiftUI.xcworkspace` and drag those folders to become local package dependency, see: [Editing a package dependency as a local package](https://developer.apple.com/documentation/xcode/editing-a-package-dependency-as-a-local-package)
+
+If you really want to build framework instead of using Xcode's package dependency, following the manual steps below:
+
+1. Clone SDWebImage, open `SDWebImage.xcodeproj` and build `SDWebImage` target for visionOS platform (Change `MACH_O_TYPE` to static library if you need)
+2. Clone SDWebImageSwiftUI, create directory at `Carthage/Build/visionOS` and copy `SDWebImage.framework` into it
+3. Open `SDWebImageSwiftUI.xcodeproj` and build `SDWebImageSwiftUI visionOS` target
 
 ## Features
 
@@ -48,33 +64,41 @@ All issue reports, feature requests, contributions, and GitHub stars are welcome
 
 ## Requirements
 
-+ Xcode 12+
-+ iOS 13+
-+ macOS 10.15+
-+ tvOS 13+
-+ watchOS 6+
-+ Swift 5.2+
++ Xcode 14+
++ iOS 14+
++ macOS 11+
++ tvOS 14+
++ watchOS 7+
++ visionOS 1+
 
-## SwiftUI 2.0 Compatibility
+## for SwiftUI 1.0 (iOS 13)
 
 iOS 14(macOS 11) introduce the SwiftUI 2.0, which keep the most API compatible, but changes many internal behaviors, which breaks the SDWebImageSwiftUI's function.
 
-From v2.0.0, we adopt SwiftUI 2.0 and iOS 14(macOS 11)'s behavior. You can use `WebImage` and `AnimatedImage` inside the new `LazyVStack`.
+From v3.0.0, SDWebImageSwiftUI drop iOS 13 support. To use on iOS 13, checkout the latest v2.x version (or using [2.x](https://github.com/SDWebImage/SDWebImageSwiftUI/tree/2.x) branch) instead.
+
+## for future transition
+
+Since SDWebImage 6.0 will introduce mixed Swift/Objc codebase, this repo will migrate into [SDWebImage Core Repo](https://github.com/SDWebImage/SDWebImage).
+
+But don't worry, we will use the automatic cross module overlay, whic means, you can use:
 
 ```swift
-var body: some View {
-    ScrollView {
-        LazyVStack {
-            ForEach(urls, id: \.self) { url in
-                AnimatedImage(url: url)
-            }
-        }
-    }
-}
+import SwiftUI
+import SDWebImage
 ```
 
-Note: However, many differences behavior between iOS 13/14's is hard to fixup. Due to maintain issue, in the future release, we will drop the iOS 13 supports and always match SwiftUI 2.0's behavior.
+to works like:
 
+```
+import SwiftUI
+import SDWebImage
+import SDWebImageSwiftUI // <-- Automatic infer this
+```
+
+You will automatically link the `SDWebImageSwiftUI`, and this library's naming will still be preserved in SPM target. So the transition is smooth for most of you, I don't want to bump another major version. **The 3.x is the final version for SDWebImageSwiftUI dedicated repo**
+
+Note: For super advanced user, if you using some custom Swift toolchain, be sure to pass `-Xfrontend -enable-cross-import-overlays`
 
 ## Installation
 
@@ -93,7 +117,7 @@ For downstream framework author, you should create a `Package.swift` file into y
 ```swift
 let package = Package(
     dependencies: [
-        .package(url: "https://github.com/SDWebImage/SDWebImageSwiftUI.git", from: "2.0.0")
+        .package(url: "https://github.com/SDWebImage/SDWebImageSwiftUI.git", from: "3.0.0")
     ],
 )
 ```
@@ -128,17 +152,15 @@ github "SDWebImage/SDWebImageSwiftUI"
 
 ```swift
 var body: some View {
-    WebImage(url: URL(string: "https://nokiatech.github.io/heif/content/images/ski_jump_1440x960.heic"))
+    WebImage(url: URL(string: "https://nokiatech.github.io/heif/content/images/ski_jump_1440x960.heic")) { image in
+        image.resizable() // Control layout like SwiftUI.AsyncImage, you must use this modifier or the view will use the image bitmap size
+    } placeholder: {
+            Rectangle().foregroundColor(.gray)
+    }
     // Supports options and context, like `.delayPlaceholder` to show placeholder only when error
     .onSuccess { image, data, cacheType in
         // Success
         // Note: Data exist only when queried from disk cache or network. Use `.queryMemoryData` if you really need data
-    }
-    .resizable() // Resizable like SwiftUI.Image, you must use this modifier or the view will use the image bitmap size
-    .placeholder(Image(systemName: "photo")) // Placeholder Image
-    // Supports ViewBuilder as well
-    .placeholder {
-        Rectangle().foregroundColor(.gray)
     }
     .indicator(.activity) // Activity Indicator
     .transition(.fade(duration: 0.5)) // Fade Transition with duration
@@ -163,7 +185,14 @@ var body: some View {
 }
 ```
 
-Note: For indicator, you can custom your own as well. For example, iOS 14/watchOS 7 introduce the new `ProgressView`, which can replace our built-in `ProgressIndicator/ActivityIndicator` (where watchOS does not provide).
+Note: For indicator, you can custom your own as well. For example, iOS 14/watchOS 7 introduce the new `ProgressView`, which can be easily used via:
+
+```swift
+WebImage(url: url)
+.indicator(.activity)
+```
+
+or you can just write like:
 
 ```swift
 WebImage(url: url)
@@ -187,20 +216,20 @@ WebImage(url: url)
 ```swift
 var body: some View {
     Group {
-        AnimatedImage(url: URL(string: "https://raw.githubusercontent.com/liyong03/YLGIFImage/master/YLGIFImageDemo/YLGIFImageDemo/joy.gif"))
+        AnimatedImage(url: URL(string: "https://raw.githubusercontent.com/liyong03/YLGIFImage/master/YLGIFImageDemo/YLGIFImageDemo/joy.gif"), placeholderImage: .init(systemName: "photo")) // Placeholder Image
         // Supports options and context, like `.progressiveLoad` for progressive animation loading
         .onFailure { error in
             // Error
         }
         .resizable() // Resizable like SwiftUI.Image, you must use this modifier or the view will use the image bitmap size
-        .placeholder(UIImage(systemName: "photo")) // Placeholder Image
-        // Supports ViewBuilder as well
-        .placeholder {
-            Circle().foregroundColor(.gray)
-        }
-        .indicator(SDWebImageActivityIndicator.medium) // Activity Indicator
+        .indicator(.activity) // Activity Indicator
         .transition(.fade) // Fade Transition
         .scaledToFit() // Attention to call it on AnimatedImage, but not `some View` after View Modifier (Swift Protocol Extension method is static dispatched)
+        
+        // Supports SwiftUI ViewBuilder placeholder as well
+        AnimatedImage(url: url) {
+            Circle().foregroundColor(.gray)
+        }
         
         // Data
         AnimatedImage(data: try! Data(contentsOf: URL(fileURLWithPath: "/tmp/foo.webp")))
@@ -208,7 +237,7 @@ var body: some View {
         .playbackRate(2.0) // Playback speed rate
         
         // Bundle (not Asset Catalog)
-        AnimatedImage(name: "animation1", isAnimating: $isAnimating)) // Animation control binding
+        AnimatedImage(name: "animation1.gif", isAnimating: $isAnimating) // Animation control binding
         .maxBufferSize(.max)
         .onViewUpdate { view, context in // Advanced native view coordinate
             // AppKit tooltip for mouse hover
@@ -226,14 +255,21 @@ Note: `AnimatedImage` supports both image url or image data for animated image f
 
 Note: `AnimatedImage` some methods like `.transition`, `.indicator` and `.aspectRatio` have the same naming as `SwiftUI.View` protocol methods. But the args receive the different type. This is because `AnimatedImage` supports to be used with UIKit/AppKit component and animation. If you find ambiguity, use full type declaration instead of the dot expression syntax.
 
-Note: some of methods on `AnimatedImage` will return `some View`, a new Modified Content. You'll lose the type related modifier method. For this case, you can either reorder the method call, or use Native View in `.onViewUpdate` for rescue.
+Note: some of methods on `AnimatedImage` will return `some View`, a new Modified Content. You'll lose the type related modifier method. For this case, you can either reorder the method call, or use native view (actually `SDAnimatedImageView`) in `.onViewUpdate`, use UIKIt/AppKit API for rescue.
 
 ```swift
+
+// Using UIKit components
 var body: some View {
-    AnimatedImage(name: "animation2") // Just for showcase, don't mix them at the same time
+    AnimatedImage(name: "animation2.gif") 
     .indicator(SDWebImageProgressIndicator.default) // UIKit indicator component
-    .indicator(Indicator.progress) // SwiftUI indicator component
     .transition(SDWebImageTransition.flipFromLeft) // UIKit animation transition
+}
+
+// Using SwiftUI components
+var body: some View {
+    AnimatedImage(name: "animation2.gif")
+    .indicator(Indicator.progress) // SwiftUI indicator component
     .transition(AnyTransition.flipFromLeft) // SwiftUI animation transition
 }
 ```
@@ -260,7 +296,7 @@ It looks familiar like `SDWebImageManager`, but it's built for SwiftUI world, wh
 
 ```swift
 struct MyView : View {
-    @ObservedObject var imageManager: ImageManager
+    @ObservedObject var imageManager = ImageManager()
     var body: some View {
         // Your custom complicated view graph
         Group {
@@ -271,15 +307,9 @@ struct MyView : View {
             }
         }
         // Trigger image loading when appear
-        .onAppear { self.imageManager.load() }
+        .onAppear { self.imageManager.load(url: url) }
         // Cancel image loading when disappear
         .onDisappear { self.imageManager.cancel() }
-    }
-}
-
-struct MyView_Previews: PreviewProvider {
-    static var previews: some View {
-        MyView(imageManager: ImageManager(url: URL(string: "https://via.placeholder.com/200x200.jpg"))
     }
 }
 ```
@@ -296,6 +326,7 @@ The best place to put these setup code for SwiftUI App, it's the `AppDelegate.sw
 func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
     // Add WebP/SVG/PDF support
     SDImageCodersManager.shared.addCoder(SDImageWebPCoder.shared)
+    SDImageCodersManager.shared.addCoder(SDImageAVIFCoder.shared)
     SDImageCodersManager.shared.addCoder(SDImageSVGCoder.shared)
     SDImageCodersManager.shared.addCoder(SDImagePDFCoder.shared)
     
@@ -320,12 +351,60 @@ For more information, it's really recommended to check our demo, to learn detail
 
 ## Documentation
 
-+ [SDWebImageSwiftUI API documentation](https://sdwebimage.github.io/SDWebImageSwiftUI/)
++ [SDWebImageSwiftUI API documentation](https://sdwebimage.github.io/documentation/sdwebimageswiftui/)
 + [SDWebImage API documentation](https://sdwebimage.github.io/)
 
 ## FAQ
 
 ### Common Problems
+
+#### Using WebImage/AnimatedImage in List/LazyStack/LazyGrid and ForEach
+
+SwiftUI has a known behavior(bug?) when using stateful view in `List/LazyStack/LazyGrid`.
+Only the **Top Level** view can hold its own `@State/@StateObject`, but the sub structure will lose state when scroll out of screen.
+However, WebImage/Animated is both stateful. To ensure the state keep in sync even when scroll out of screen. you may use some tricks.
+
+See more: https://twitter.com/fatbobman/status/1572507700436807683?s=21&t=z4FkAWTMvjsgL-wKdJGreQ
+
+In short, it's not recommanded to do so:
+
+```swift
+struct ContentView {
+    @State var imageURLs: [String]
+    var body: some View {
+        List {
+            ForEach(imageURLs, id: \.self) { url in
+                VStack {
+                    WebImage(url) // The top level is `VStack`
+                }
+            }
+        }
+    }
+}
+```
+
+instead, using this approach:
+
+```swift
+struct ContentView {
+    struct BodyView {
+        @State var url: String
+        var body: some View {
+            VStack {
+                WebImage(url)
+            }
+        }
+    }
+    @State var imageURLs: [String]
+    var body: some View {
+        List {
+            ForEach(imageURLs, id: \.self) { url in
+                BodyView(url: url)
+            }
+        }
+    }
+}
+```
 
 #### Using Image/WebImage/AnimatedImage in Button/NavigationLink
 
@@ -365,9 +444,142 @@ NavigationView {
 }
 ```
 
+#### Render vector image (SVG/PDF) with tint color
+
+Both `WebImage/AnimatedImage` supports to render the vector image, by using the `SVG/PDF` external coders. However they are different internally.
+
++ `AnimatedImage`: use tech from Apple's symbol image and vector drawing, supports dynamic size changes without lossing details. And it use UIKit/AppKit based implementation and APIs. If you want, pass `.context(.imageThumbnailPixelSize: size)` to use bitmap rendering and get more pixels.
++ `WebImage`: draws vector image into a bitmap version. Which just like normal PNG. By default, we use vector image content size (SVG canvas size or PDF media box size). If you want, pass `.context(.imageThumbnailPixelSize: size)` to get more pixels.
+
+For bitmap rendering, you can also tint the SVG/PDF icons with custom colors (like symbol images), use the `.renderingMode(.template)` and `.tint(:)` or `.foregroundColor(:)` modifier, which matches `SwiftUI.Image` behavior.
+
++ WebImage
+
+```swift
+var body: some View {
+    WebImage(url: URL(string: "https://dev.w3.org/SVG/tools/svgweb/samples/svg-files/w3c.svg"))
+    .resizable()
+    .renderingMode(.template)
+    .foregroundColor(.red) // or `.tint(:)`, `.accentColor(:)`
+    .scaledToFit()
+}
+```
+
++ AnimatedImage
+
+```swift
+var body: some View {
+    AnimatedImage(url: URL(string: "https://dev.w3.org/SVG/tools/svgweb/samples/svg-files/w3c.svg"), context: [.imageThumbnailPixelSize : CGSize(width: 100, height: 100)])
+    .resizable()
+    .renderingMode(.template)
+    // seems `.foregroundColor(:)` does effect `UIView.tintColor`, use `tint(:)` or `.accentColor(:)` instead.
+    // Or you can use `onViewCreate(:)` to get native `SDAnimatedImageView` and set `tintColor` (AppKit use `contentTintColor`)
+    .tint(.red)
+    .scaledToFit()
+}
+```
+
+See more: [Configuring and displaying symbol images in your UI](https://developer.apple.com/documentation/uikit/uiimage/configuring_and_displaying_symbol_images_in_your_ui?language=objc)
+
+#### Using with external loaders/caches/coders
+
+SDWebImage itself, supports many custom loaders (like [Firebase Storage](https://github.com/firebase/FirebaseUI-iOS) and [PhotosKit](https://github.com/SDWebImage/SDWebImagePhotosPlugin)), caches (like [YYCache](https://github.com/SDWebImage/SDWebImageYYPlugin) and [PINCache](https://github.com/SDWebImage/SDWebImagePINPlugin)), and coders (like [WebP](https://github.com/SDWebImage/SDWebImageWebPCoder) and [AVIF](https://github.com/SDWebImage/SDWebImageAVIFCoder), even [Lottie](https://github.com/SDWebImage/SDWebImageLottieCoder)).
+
+Here is the tutorial to setup these external components with SwiftUI environment.
+
+##### Setup external SDKs
+
+You can put the setup code inside your SwiftUI `App.init()` method.
+
+```swift
+@main
+struct MyApp: App {
+    
+    init() {
+        // Custom Firebase Storage Loader
+        FirebaseApp.configure()
+        SDImageLoadersManager.shared.loaders = [FirebaseUI.StorageImageLoader.shared]
+        SDWebImageManager.defaultImageLoader = SDImageLoadersManager.shared
+        // WebP support
+        SDImageCodersManager.shared.addCoder(SDImageWebPCoder.shared)
+        // AVIF support
+        SDImageCodersManager.shared.addCoder(SDImageAVIFCoder.shared)
+    }
+    
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+        }
+    }
+}
+```
+
+or, if your App have complicated `AppDelegate` class, put setup code there:
+
+```swift
+class AppDelegate: NSObject, UIApplicationDelegate {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+        SDImageCachesManager.shared.caches = [YYCache(name: "default")]
+        SDWebImageManager.defaultImageCache = SDImageCachesManager.shared
+        return true
+    }
+}
+
+@main
+struct MyApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+        }
+    }
+}
+```
+
+##### Use external SDKs
+
+For some of custom loaders, you need to create the `URL` struct with some special APIs, so that SDWebImage can retrieve the context from other SDKs, like:
+
++ FirebaseStorage
+
+```swift
+let storageRef: StorageReference
+let storageURL = NSURL.sd_URL(with: storageRef) as URL?
+// Or via convenience extension
+let storageURL = storageRef.sd_URLRepresentation
+```
+
++ PhotosKit
+
+```swift
+let asset: PHAsset
+let photosURL = NSURL.sd_URL(with: asset) as URL?
+// Or via convenience extension
+let photosURL = asset.sd_URLRepresentation
+```
+
+For some of custom coders, you need to request the image with some options to control the behavior, like Vector Images SVG/PDF. Because SwiftUI.Image or WebImage does not supports vector graph at all.
+
++ SVG/PDF Coder
+
+```swift
+let vectorURL: URL? // URL to SVG or PDF
+WebImage(url: vectorURL, context: [.imageThumbnailPixelSize: CGSize(width: 100, height: 100)])
+```
+
++ Lottie Coder
+
+```swift
+let lottieURL: URL? // URL to Lottie.json
+WebImage(url: lottieURL, isAnimating: $isAnimating)
+```
+
+For caches, you actually don't need to worry about anything. It just works after setup.
+
 #### Using for backward deployment and weak linking SwiftUI
 
-SDWebImageSwiftUI supports to use when your App Target has a deployment target version less than iOS 13/macOS 10.15/tvOS 13/watchOS 6. Which will weak linking of SwiftUI(Combine) to allows writing code with available check at runtime.
+SDWebImageSwiftUI supports to use when your App Target has a deployment target version less than iOS 14/macOS 11/tvOS 14/watchOS 7. Which will weak linking of SwiftUI(Combine) to allows writing code with available check at runtime.
 
 To use backward deployment, you have to do the follow things:
 
@@ -381,7 +593,7 @@ You should notice that all the third party SwiftUI frameworks should have this b
 
 For deployment target version below iOS 12.2 (The first version which Swift 5 Runtime bundled in iOS system), you have to change the min deployment target version of SDWebImageSwiftUI. This may take some side effect on compiler's optimization and trigger massive warnings for some frameworks.
 
-However, for iOS 12.2+, you can still keep the min deployment target version to iOS 13, no extra warnings or performance slow down for iOS 13 client.
+However, for iOS 12.2+, you can still keep the min deployment target version to iOS 14, no extra warnings or performance slow down for iOS 14 client.
 
 Because Swift use the min deployment target version to detect whether to link the App bundled Swift runtime, or the System built-in one (`/usr/lib/swift/libswiftCore.dylib`).
 
@@ -408,7 +620,7 @@ end
 + For CocoaPods user, you can skip the platform version validation in Podfile with:
 
 ```ruby
-platform :ios, '13.0' # This does not effect your App Target's deployment target version, just a hint for CocoaPods
+platform :ios, '14.0' # This does not effect your App Target's deployment target version, just a hint for CocoaPods
 ```
 
 + For SwiftPM user, SwiftPM does not support weak linking nor Library Evolution, so it can not deployment to iOS 12+ user without changing the min deployment target.
@@ -421,7 +633,7 @@ Add **all the SwiftUI code** with the available annotation and runtime check, li
 // AppDelegate.swift
 func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
     // ...
-    if #available(iOS 13, *) {
+    if #available(iOS 14, *) {
         window.rootViewController = UIHostingController(rootView: ContentView())
     } else {
         window.rootViewController = ViewController()
@@ -443,11 +655,11 @@ class ViewController: UIViewController {
 }
 
 // ContentView.swift
-@available(iOS 13.0, OSX 10.15, tvOS 13.0, watchOS 6.0, *)
+@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 struct ContentView : View {
     var body: some View {
         Group {
-            Text("Hello World iOS 13!")
+            Text("Hello World iOS 14!")
             WebImage(url: URL(string: "https://i.loli.net/2019/09/24/rX2RkVWeGKIuJvc.jpg"))
         }
     }
@@ -458,12 +670,10 @@ struct ContentView : View {
 
 To run the example using SwiftUI, following the steps:
 
-```
-cd Example
-pod install
-```
+1. Open `SDWebImageSwiftUI.xcworkspace`, wait for SwiftPM finishing downloading the test dependency.
+2. Choose `SDWebImageSwiftUIDemo` (or other platforms) scheme and run the demo application.
 
-Then open the Xcode Workspace to run the demo application.
+Note: The `Podfile` here is because history we use CocoaPods to integrate libs into Demo, but now we use SPM.
 
 Since SwiftUI is aimed to support all Apple platforms, our demo does this as well, one codebase including:
 
@@ -471,11 +681,12 @@ Since SwiftUI is aimed to support all Apple platforms, our demo does this as wel
 + macOS
 + tvOS
 + watchOS
++ visionOS
 
 Demo Tips:
 
-1. Use `Switch` (right-click on macOS/force press on watchOS) to switch between `WebImage` and `AnimatedImage`.
-2. Use `Reload` (right-click on macOS/force press on watchOS) to clear cache.
+1. Use `Switch` (right-click on macOS/tap on watchOS) to switch between `WebImage` and `AnimatedImage`.
+2. Use `Reload` (right-click on macOS/button on watchOS) to clear cache.
 3. Use `Swipe Left` (menu button on tvOS) to delete one image url from list.
 4. Pinch gesture (Digital Crown on watchOS, play button on tvOS) to zoom-in detail page image.
 5. Clear cache and go to detail page to see progressive loading.
@@ -486,12 +697,12 @@ SDWebImageSwiftUI has Unit Test to increase code quality. For SwiftUI, there are
 
 However, since SwiftUI is State-Based and Attributed-Implemented layout system, there are open source projects who provide the solution:
 
-+ [ViewInspector](https://github.com/nalexn/ViewInspector): Inspect View's runtime attribute value (like `.frame` modifier, `.image` value). We use this to test `AnimatedImage` and `WebImage`. It also allows the inspect to native UIView/NSView, which we use to test `ActivityIndicator` and `ProgressIndicator`.
++ [ViewInspector](https://github.com/nalexn/ViewInspector): Inspect View's runtime attribute value (like `.frame` modifier, `.image` value). We use this to test `AnimatedImage` and `WebImage`. It also allows the inspect to native UIView/NSView.
 
 To run the test:
 
-1. Run `carthage build` on root directory to install the dependency.
-2. Open `SDWebImageSwiftUI.xcodeproj`, wait for SwiftPM finishing downloading the test dependency.
+1. Run `pod install` on root directory to install the dependency.
+2. Open `SDWebImageSwiftUI.xcworkspace`, wait for SwiftPM finishing downloading the test dependency.
 3. Choose `SDWebImageSwiftUITests` scheme and start testing.
 
 We've already setup the CI pipeline, each PR will run the test case and upload the test report to [codecov](https://codecov.io/gh/SDWebImage/SDWebImageSwiftUI).
@@ -532,11 +743,13 @@ Which means, this project is one core use case and downstream dependency, which 
 
 - [SDWebImage](https://github.com/SDWebImage/SDWebImage)
 - [libwebp](https://github.com/SDWebImage/libwebp-Xcode)
+- [libavif](https://github.com/SDWebImage/libavif-Xcode)
 - [Kingfisher](https://github.com/onevcat/Kingfisher)
 - [SwiftUIX](https://github.com/SwiftUIX/SwiftUIX)
 - [Espera](https://github.com/JagCesar/Espera)
 - [SwiftUI-Introspect](https://github.com/siteline/SwiftUI-Introspect)
 - [ViewInspector](https://github.com/nalexn/ViewInspector)
+- [SwiftUIBackports](https://github.com/shaps80/SwiftUIBackports)
 
 ## License
 
