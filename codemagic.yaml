@@ -47,5 +47,7 @@ workflows:
           cd Modules/Features
           swift test
     artifacts:
-      - build/ios/ipa/*.ipa
-      - /tmp/xcodebuild_logs/*.log
+      - build/ios/ipa/**/*.ipa
+      - build/ios/app/**/*.app
+      - $HOME/Library/Developer/Xcode/DerivedData/DeltaGames-*/Build/Products/Release-iphoneos/**/*.ipa
+      - /tmp/xcodebuild_logs/**/*.log
