@@ -46,14 +46,22 @@ jobs:
         run: |
           cd Modules/CoreCommon
           swift test --enable-code-coverage
-          # Generate LCOV report from profdata
           PROFDATA=$(find .build/debug/codecov -name "*.profdata" | head -1)
-          BINARY=$(find .build/debug -maxdepth 1 -type f -perm +111 | head -1)
-          if [ -n "$PROFDATA" ] && [ -n "$BINARY" ]; then
-            xcrun llvm-cov export -format=lcov "$BINARY" \
+          BINARY=".build/debug/CoreCommonPackageTests.xctest/Contents/MacOS/CoreCommonPackageTests"
+          echo "PROFDATA: $PROFDATA"
+          echo "BINARY exists: $(test -f "$BINARY" && echo yes || echo no)"
+          if [ -n "$PROFDATA" ] && [ -f "$BINARY" ]; then
+            xcrun llvm-cov export \
+              -format=lcov \
               -instr-profile="$PROFDATA" \
-              --ignore-filename-regex=".build|Tests" \
-              > coverage-corecommon.lcov
+              --ignore-filename-regex="\.build|Tests" \
+              "$BINARY" > coverage-corecommon.lcov
+            echo "Generated $(wc -l < coverage-corecommon.lcov) lines of LCOV"
+          else
+            echo "Skipping LCOV: profdata=$PROFDATA binary=$BINARY"
+            # List what's available for debugging
+            find .build/debug -name "*.xctest" 2>/dev/null || true
+            find .build/debug/codecov -name "*.profdata" 2>/dev/null || true
           fi
 
       - name: Run Feature Modules Tests
@@ -62,14 +70,22 @@ jobs:
         run: |
           cd Modules/Features
           swift test --enable-code-coverage
-          # Generate LCOV report from profdata
           PROFDATA=$(find .build/debug/codecov -name "*.profdata" | head -1)
-          BINARY=$(find .build/debug -maxdepth 1 -type f -perm +111 | head -1)
-          if [ -n "$PROFDATA" ] && [ -n "$BINARY" ]; then
-            xcrun llvm-cov export -format=lcov "$BINARY" \
+          BINARY=".build/debug/FeaturesPackageTests.xctest/Contents/MacOS/FeaturesPackageTests"
+          echo "PROFDATA: $PROFDATA"
+          echo "BINARY exists: $(test -f "$BINARY" && echo yes || echo no)"
+          if [ -n "$PROFDATA" ] && [ -f "$BINARY" ]; then
+            xcrun llvm-cov export \
+              -format=lcov \
               -instr-profile="$PROFDATA" \
-              --ignore-filename-regex=".build|Tests" \
-              > coverage-features.lcov
+              --ignore-filename-regex="\.build|Tests" \
+              "$BINARY" > coverage-features.lcov
+            echo "Generated $(wc -l < coverage-features.lcov) lines of LCOV"
+          else
+            echo "Skipping LCOV: profdata=$PROFDATA binary=$BINARY"
+            # List what's available for debugging
+            find .build/debug -name "*.xctest" 2>/dev/null || true
+            find .build/debug/codecov -name "*.profdata" 2>/dev/null || true
           fi
 
       - name: Upload CoreCommon Coverage
