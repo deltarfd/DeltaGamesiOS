@@ -14,7 +14,6 @@ workflows:
       xcode: latest
       cocoapods: default
       vars:
-        # API key is managed via Codemagic environment variable
         # Set RAWG_API_KEY in Codemagic dashboard > Project Settings > Environment variables
         RAWG_API_KEY: $RAWG_API_KEY
     scripts:
@@ -27,7 +26,15 @@ workflows:
             brew install swiftlint
           fi
           swiftlint lint --config .swiftlint.yml DeltaGames
-      - name: Build iOS
+      - name: Test CoreCommon Package
+        script: |
+          cd Modules/CoreCommon
+          swift test
+      - name: Test Feature Modules Package
+        script: |
+          cd Modules/Features
+          swift test
+      - name: Build iOS (Simulator)
         script: |
           export RAWG_API_KEY="$RAWG_API_KEY"
           xcodebuild \
@@ -35,19 +42,18 @@ workflows:
             -scheme DeltaGames \
             -destination 'generic/platform=iOS Simulator' \
             -configuration Release \
+            -derivedDataPath "$CM_BUILD_DIR/DerivedData" \
             clean build
-      - name: Test CoreCommon Package
+      - name: Package app artifact
         script: |
-          export RAWG_API_KEY="$RAWG_API_KEY"
-          cd Modules/CoreCommon
-          swift test
-      - name: Test Feature Modules Package
-        script: |
-          export RAWG_API_KEY="$RAWG_API_KEY"
-          cd Modules/Features
-          swift test
+          mkdir -p "$CM_BUILD_DIR/artifacts"
+          APP_PATH=$(find "$CM_BUILD_DIR/DerivedData/Build/Products" -type d -name "*.app" | head -1)
+          if [ -z "$APP_PATH" ]; then
+            echo "No .app bundle found under DerivedData products"
+            exit 1
+          fi
+          ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" "$CM_BUILD_DIR/artifacts/DeltaGames-Simulator.app.zip"
     artifacts:
-      - build/ios/ipa/**/*.ipa
-      - build/ios/app/**/*.app
-      - $HOME/Library/Developer/Xcode/DerivedData/DeltaGames-*/Build/Products/Release-iphoneos/**/*.ipa
+      - $CM_BUILD_DIR/DerivedData/Build/Products/**/*.app
+      - $CM_BUILD_DIR/artifacts/*.zip
       - /tmp/xcodebuild_logs/**/*.log
