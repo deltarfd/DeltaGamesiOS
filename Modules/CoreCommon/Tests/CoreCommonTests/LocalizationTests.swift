@@ -22,4 +22,10 @@ final class LocalizationTests: XCTestCase {
 
     XCTAssertEqual(value, "unknown.key.without.fallback")
   }
+
+  func testLocalizedReturnsEmptyWhenKeyAndFallbackAreEmpty() {
+    let value = CommonLocalization.localized("", fallback: "")
+
+    XCTAssertEqual(value, "")
+  }
 }
