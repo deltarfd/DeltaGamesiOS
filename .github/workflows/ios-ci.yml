@@ -37,6 +37,7 @@ jobs:
             -scheme DeltaGames \
             -destination 'generic/platform=iOS Simulator' \
             -configuration Debug \
+            -derivedDataPath DerivedData \
             clean build
 
       - name: Run CoreCommon Tests
@@ -45,6 +46,15 @@ jobs:
         run: |
           cd Modules/CoreCommon
           swift test --enable-code-coverage
+          # Generate LCOV report from profdata
+          PROFDATA=$(find .build/debug/codecov -name "*.profdata" | head -1)
+          BINARY=$(find .build/debug -maxdepth 1 -type f -perm +111 | head -1)
+          if [ -n "$PROFDATA" ] && [ -n "$BINARY" ]; then
+            xcrun llvm-cov export -format=lcov "$BINARY" \
+              -instr-profile="$PROFDATA" \
+              --ignore-filename-regex=".build|Tests" \
+              > coverage-corecommon.lcov
+          fi
 
       - name: Run Feature Modules Tests
         env:
@@ -52,6 +62,15 @@ jobs:
         run: |
           cd Modules/Features
           swift test --enable-code-coverage
+          # Generate LCOV report from profdata
+          PROFDATA=$(find .build/debug/codecov -name "*.profdata" | head -1)
+          BINARY=$(find .build/debug -maxdepth 1 -type f -perm +111 | head -1)
+          if [ -n "$PROFDATA" ] && [ -n "$BINARY" ]; then
+            xcrun llvm-cov export -format=lcov "$BINARY" \
+              -instr-profile="$PROFDATA" \
+              --ignore-filename-regex=".build|Tests" \
+              > coverage-features.lcov
+          fi
 
       - name: Upload CoreCommon Coverage
         uses: codecov/codecov-action@v4
@@ -59,7 +78,7 @@ jobs:
           flags: corecommon
           fail_ci_if_error: false
           verbose: true
-          directory: Modules/CoreCommon/.build
+          files: Modules/CoreCommon/coverage-corecommon.lcov
 
       - name: Upload Features Coverage
         uses: codecov/codecov-action@v4
@@ -67,16 +86,14 @@ jobs:
           flags: features
           fail_ci_if_error: false
           verbose: true
-          directory: Modules/Features/.build
+          files: Modules/Features/coverage-features.lcov
 
       - name: Upload Build Artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: build-output
-          path: |
-            build/
-            DerivedData/
+          path: DerivedData/
           retention-days: 30
 
       - name: Upload Build Logs
