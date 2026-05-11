@@ -93,6 +93,7 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: corecommon
+          disable_search: true
           fail_ci_if_error: false
           verbose: true
           files: Modules/CoreCommon/coverage-corecommon.lcov
@@ -102,6 +103,7 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: features
+          disable_search: true
           fail_ci_if_error: false
           verbose: true
           files: Modules/Features/coverage-features.lcov

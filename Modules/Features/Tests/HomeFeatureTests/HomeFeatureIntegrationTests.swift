@@ -63,6 +63,17 @@ class HomeFeatureIntegrationTests: XCTestCase {
     let factory = HomeFeatureFactory.self
     XCTAssertNotNil(factory)
   }
+
+  func testHomeFeatureFactoryCanBuildView() {
+    let mockUseCase = MockHomeUseCase()
+
+    let view = HomeFeatureFactory.makeHomeView(
+      homeUseCase: mockUseCase,
+      detailViewBuilder: { _ in AnyView(EmptyView()) }
+    )
+
+    XCTAssertNotNil(view)
+  }
   
   func testMockHomeUseCaseConformanceToProtocol() {
     let mockUseCase = MockHomeUseCase()
