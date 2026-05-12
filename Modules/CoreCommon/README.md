@@ -17,11 +17,10 @@ Generic protocols and helpers for Swift iOS development.
 ## Installation
 
 ### Swift Package Manager
-
 Add to `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/YOUR_USERNAME/delta-games-core-common.git", from: "1.0.0")
+.package(url: "https://github.com/deltarfd/DeltaGamesiOS-CoreCommon.git", from: "1.0.1")
 ```
 
 In Xcode:
@@ -198,6 +197,11 @@ For issues and feature requests, please use GitHub Issues.
 
 ## Changelog
 
+### 1.0.1
+- Documentation updates and corrections
+- Updated package repository URL examples
+- Removed Features repository reference from Related Projects
+
 ### 1.0.0 (Initial Release)
 - Generic UseCase protocol (sync)
 - AsyncUseCase protocol (async/await)
@@ -208,7 +212,6 @@ For issues and feature requests, please use GitHub Issues.
 ## Related Projects
 
 - [DeltaGames](https://github.com/deltarfd/DeltaGamesiOS) - Main iOS application using CoreCommon
-- [Features](https://github.com/deltarfd/delta-games-features) - Feature-specific SPM packages
 
 ## Authors
 
@@ -220,7 +223,7 @@ For issues and feature requests, please use GitHub Issues.
 
 ```swift
 // 1. Add to Package.swift
-.package(url: "https://github.com/YOUR_USERNAME/delta-games-core-common.git", from: "1.0.0")
+.package(url: "https://github.com/deltarfd/DeltaGamesiOS-CoreCommon.git", from: "1.0.1")
 
 // 2. Import and use
 import CoreCommon

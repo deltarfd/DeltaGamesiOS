@@ -16,7 +16,7 @@ let package = Package(
     .library(name: "ProfileFeature", targets: ["ProfileFeature"])
   ],
   dependencies: [
-    .package(url: "https://github.com/deltarfd/DeltaGamesiOS-CoreCommon.git", from: "1.0.0")
+    .package(url: "https://github.com/deltarfd/DeltaGamesiOS-CoreCommon.git", from: "1.0.1")
   ],
   targets: [
     .target(name: "HomeFeature", dependencies: [.product(name: "CoreCommon", package: "deltagamesios-corecommon")]),
