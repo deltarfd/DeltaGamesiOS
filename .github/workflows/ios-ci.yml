@@ -44,8 +44,8 @@ jobs:
 
       - name: Detect Available iOS Simulator
         run: |
-          SIM_ID=$(xcrun simctl list devices available | grep "iPhone" | grep -v "unavailable" | head -1 | awk '{print $NF}' | tr -d '{} ')
-          if [ -z "$SIM_ID" ]; then
+          SIM_ID=$(xcrun simctl list devices available | grep "iPhone" | grep -v "unavailable" | head -1 | sed -E 's/.*id:([^,]+).*/\1/')
+          if [ -z "$SIM_ID" ] || [ "$SIM_ID" = "(Shutdown)" ]; then
             echo "No available iPhone simulator found on this runner."
             xcrun simctl list devices available
             exit 1

@@ -33,8 +33,8 @@ workflows:
             echo "Set RAWG_API_KEY in Codemagic dashboard > Project Settings > Environment variables"
           fi
           
-          SIM_ID=$(xcrun simctl list devices available | grep "iPhone" | head -1 | awk '{print $NF}' | tr -d '{} ')
-          if [ -z "$SIM_ID" ]; then
+          SIM_ID=$(xcrun simctl list devices available | grep "iPhone" | head -1 | sed -E 's/.*id:([^,]+).*/\1/')
+          if [ -z "$SIM_ID" ] || [ "$SIM_ID" = "(Shutdown)" ]; then
             echo "No available iPhone simulator found on Codemagic machine"
             xcrun simctl list devices available
             exit 1
