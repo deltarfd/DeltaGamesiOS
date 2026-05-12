@@ -27,3 +27,7 @@ env.local
 .env.local
 *.key
 *.pem
+
+# External modules (published as separate packages)
+Modules/CoreCommon/
+Modules/Features/
