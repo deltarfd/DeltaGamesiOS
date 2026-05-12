@@ -10,6 +10,7 @@ import SwiftUI
 struct MainView: View {
 
     @State private var selection = 0
+    @AppStorage("app_language") private var appLanguageCode: String = AppLanguage.system.rawValue
   @EnvironmentObject var homePresenter: HomePresenter
   @EnvironmentObject var searchPresenter: SearchPresenter
   @EnvironmentObject var favoritePresenter: FavoritePresenter
@@ -19,34 +20,34 @@ struct MainView: View {
             HomeView(presenter: homePresenter)
                 .tabItem {
                     if selection == 0 {
-                        Label("Home", systemImage: "house.circle.fill")
+                        Label(L10n.text("tab.home"), systemImage: "house.circle.fill")
                     } else {
-                        Label("Home", systemImage: "house.circle")
+                        Label(L10n.text("tab.home"), systemImage: "house.circle")
                     }
                 }.tag(0)
 
           SearchView(presenter: searchPresenter)
                 .tabItem {
                     if selection == 1 {
-                        Label("Search", systemImage: "magnifyingglass.circle.fill")
+                        Label(L10n.text("tab.search"), systemImage: "magnifyingglass.circle.fill")
                     } else {
-                        Label("Search", systemImage: "magnifyingglass.circle")
+                        Label(L10n.text("tab.search"), systemImage: "magnifyingglass.circle")
                     }
                 }.tag(1)
             FavoriteView(presenter: favoritePresenter)
                 .tabItem {
                     if selection == 2 {
-                        Label("Favorite", systemImage: "heart.circle.fill")
+                        Label(L10n.text("tab.favorite"), systemImage: "heart.circle.fill")
                     } else {
-                        Label("Favorite", systemImage: "heart.circle")
+                        Label(L10n.text("tab.favorite"), systemImage: "heart.circle")
                     }
                 }.tag(2)
             ProfileView()
                 .tabItem {
                     if selection == 3 {
-                        Label("Profile", systemImage: "person.crop.circle.fill")
+                        Label(L10n.text("tab.profile"), systemImage: "person.crop.circle.fill")
                     } else {
-                        Label("Profile", systemImage: "person.crop.circle")
+                        Label(L10n.text("tab.profile"), systemImage: "person.crop.circle")
                     }
                 }.tag(3)
         }

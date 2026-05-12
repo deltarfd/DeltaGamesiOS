@@ -11,6 +11,7 @@ struct HomeView: View {
     let rows = [GridItem(.flexible())]
     let columns = [GridItem(.flexible()), GridItem(.flexible())]
     @State private var hasInitialized = false
+  @AppStorage("app_language") private var appLanguageCode: String = AppLanguage.system.rawValue
     @ObservedObject var presenter: HomePresenter
  
     var body: some View {
@@ -20,13 +21,13 @@ struct HomeView: View {
                 HStack {
                     VStack(alignment: .leading) {
                         HStack {
-                            Text("Hey")
+                          Text(L10n.text("home.greeting"))
                                 .font(.title3)
                             Text("Delta R F D 👋🏻")
                                 .bold()
                                 .font(.title3)
                         }
-                        Text("Let's Explore The Games!")
+                        Text(L10n.text("home.subtitle"))
                             .font(.title3)
                           .foregroundColor(.appPrimary)
                     }
@@ -38,7 +39,7 @@ struct HomeView: View {
                         .frame(maxHeight: 150, alignment: .trailing)
 
                 }.padding(.horizontal)
-                Label("New & Trending", systemImage: "flame")
+                Label(L10n.text("home.new_trending"), systemImage: "flame")
                     .padding(.horizontal)
                     .font(Font.title2.weight(.bold))
                   .foregroundColor(.appPrimary)
@@ -59,7 +60,7 @@ struct HomeView: View {
                     Spacer()
                   }
                 }
-                Label("Explore Games", systemImage: "gamecontroller")
+                Label(L10n.text("home.explore_games"), systemImage: "gamecontroller")
                     .padding(.horizontal)
                     .font(Font.title2.weight(.bold))
                   .foregroundColor(.appPrimary)

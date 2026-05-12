@@ -8,13 +8,14 @@
 import SwiftUI
 
 struct FavoriteView: View {
+  @AppStorage("app_language") private var appLanguageCode: String = AppLanguage.system.rawValue
     @ObservedObject var presenter: FavoritePresenter
     let columns = [GridItem(.flexible()), GridItem(.flexible())]
     var body: some View {
     AppNavigationContainer {
           ScrollView {
               VStack(alignment: .leading) {
-                Label("Favorite Games", systemImage: "heart.circle.fill")
+                Label(L10n.text("favorite.title"), systemImage: "heart.circle.fill")
                     .padding(.horizontal)
                     .font(Font.title2.weight(.bold))
                   .foregroundColor(.appPrimary)
@@ -30,7 +31,7 @@ struct FavoriteView: View {
                       } else {
                         if presenter.favGames.isEmpty {
                           HStack {
-                              Text("No Favorite Game")
+                              Text(L10n.text("favorite.empty"))
                                   .padding(.top, 64)
                           }
                         } else {

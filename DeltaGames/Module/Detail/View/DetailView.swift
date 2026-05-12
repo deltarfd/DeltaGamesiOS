@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct DetailView: View {
+  @AppStorage("app_language") private var appLanguageCode: String = AppLanguage.system.rawValue
   @StateObject var presenter: DetailPresenter
   @State private var hasInitialized = false
   private let onDismiss: ((FavoriteChange?) -> Void)?
@@ -95,10 +96,13 @@ extension DetailView {
                         .font(Font.headline.weight(.bold))
                         .foregroundColor(.primary)
                 }
-                Text("Released: \(presenter.game.released ?? "-")")
-                    .padding(.horizontal)
-                    .font(.caption)
-                  .foregroundColor(.appPrimary)
+                HStack(spacing: 4) {
+                  Text(L10n.text("detail.released"))
+                  Text(presenter.game.released ?? "-")
+                }
+                .padding(.horizontal)
+                .font(.caption)
+                .foregroundColor(.appPrimary)
                 Text((presenter.game.parentPlatforms ?? []).map { $0.platform.name }.joined(separator: ", "))
                     .padding(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
                     .font(.headline)
@@ -107,10 +111,13 @@ extension DetailView {
                     .padding(.horizontal)
                     .font(.headline)
                   .foregroundColor(.appPrimary)
-                Text("Tags: " + (presenter.game.tags ?? []).map { $0.name }.joined(separator: ", "))
+                HStack(spacing: 4) {
+                  Text(L10n.text("detail.tags"))
+                  Text((presenter.game.tags ?? []).map { $0.name }.joined(separator: ", "))
+                }
                     .padding(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
                     .font(.headline)
-                Text("Description")
+                Text(L10n.text("detail.description"))
                     .padding(.horizontal)
                     .font(.headline)
                   .foregroundColor(.appPrimary)

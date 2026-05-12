@@ -12,13 +12,14 @@ struct SearchView: View {
   @State private var isEditing = false
   @State private var searchWorkItem: DispatchWorkItem?
   @State private var hasInitialized = false
+  @AppStorage("app_language") private var appLanguageCode: String = AppLanguage.system.rawValue
   @ObservedObject var presenter: SearchPresenter
   let columns = [GridItem(.flexible()), GridItem(.flexible())]
   var body: some View {
     AppNavigationContainer {
         ScrollView {
             VStack(alignment: .leading) {
-                Label("Search Games", systemImage: "magnifyingglass.circle.fill")
+            Label(L10n.text("search.title"), systemImage: "magnifyingglass.circle.fill")
                     .padding(.horizontal)
                     .font(Font.title2.weight(.bold))
                   .foregroundColor(.appPrimary)
@@ -36,7 +37,7 @@ struct SearchView: View {
                 } else if presenter.searchGames.isEmpty && !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                   HStack {
                       Spacer()
-                      Text("Game is Not Found")
+                    Text(L10n.text("search.not_found"))
                           .padding(.top, 64)
                       Spacer()
                   }
@@ -66,7 +67,7 @@ struct SearchView: View {
 extension SearchView {
     var searchBarView: some View {
         HStack {
-          TextField(String.UIString.searchPlaceholder, text: $searchText)
+          TextField(L10n.text("search.placeholder"), text: $searchText)
                 .onChange(of: searchText, perform: { _ in
                   searchWorkItem?.cancel()
                   let workItem = DispatchWorkItem {
@@ -108,7 +109,7 @@ extension SearchView {
                     // Dismiss the keyboard
                     UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                 } label: {
-                    Text("Cancel")
+                  Text(L10n.text("common.cancel"))
                 }
                 .padding(.trailing, 10)
                 .transition(.move(edge: .trailing))
