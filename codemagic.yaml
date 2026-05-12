@@ -26,14 +26,17 @@ workflows:
             brew install swiftlint
           fi
           swiftlint lint --config .swiftlint.yml DeltaGames
-      - name: Test CoreCommon Package
+      - name: Run App Tests (includes SPM dependencies)
         script: |
-          cd Modules/CoreCommon
-          swift test
-      - name: Test Feature Modules Package
-        script: |
-          cd Modules/Features
-          swift test
+          export RAWG_API_KEY="$RAWG_API_KEY"
+          xcodebuild \
+            -workspace DeltaGames.xcworkspace \
+            -scheme DeltaGames \
+            -destination 'platform=iOS Simulator,name=iPhone 15' \
+            -configuration Debug \
+            -derivedDataPath "$CM_BUILD_DIR/DerivedData" \
+            -enableCodeCoverage YES \
+            test
       - name: Build iOS (Simulator)
         script: |
           export RAWG_API_KEY="$RAWG_API_KEY"

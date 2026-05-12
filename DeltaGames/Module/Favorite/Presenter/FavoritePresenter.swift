@@ -16,7 +16,6 @@ extension Notification.Name {
 final class FavoritePresenter: ObservableObject {
   private var favoritesRequest: AnyCancellable?
   private var favoritesChangeObserver: AnyCancellable?
-  private let router = FavoriteRouter()
   private let favoriteUseCase: FavoriteUseCase
   private var shouldRefreshOnAppear = false
 
@@ -92,13 +91,16 @@ final class FavoritePresenter: ObservableObject {
 
   func linkBuilder<Content: View>(
     for game: GameModel,
+    destination: @escaping (GameModel, ((FavoriteChange?) -> Void)?) -> AnyView,
     @ViewBuilder content: () -> Content
   ) -> some View {
-    NavigationLink(
-      destination: LazyView(self.router.makeDetailView(for: game, onDismiss: { [weak self] change in
-        self?.applyFavoriteChange(change)
-      }))
+    let onDismiss: ((FavoriteChange?) -> Void)? = { [weak self] change in
+      self?.applyFavoriteChange(change)
+    }
+    return AnyView(NavigationLink(
+      destination: destination(game, onDismiss)
     ) { content() }
+    )
   }
 
 }

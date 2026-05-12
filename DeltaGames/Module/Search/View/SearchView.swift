@@ -122,7 +122,9 @@ extension SearchView {
     var searchGameView: some View {
         LazyVGrid(columns: columns, alignment: .center) {
           ForEach(self.presenter.searchGames) { game in
-            self.presenter.linkBuilder(for: game) {
+            self.presenter.linkBuilder(for: game, destination: { linkedGame in
+                AnyView(LazyView(SearchRouter().makeDetailView(for: linkedGame)))
+            }) {
                     GameCardView(game: game)
                         .padding()
                         .frame(height: UIScreen.main.bounds.height/3)

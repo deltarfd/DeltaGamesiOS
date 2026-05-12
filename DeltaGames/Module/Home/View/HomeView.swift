@@ -100,7 +100,9 @@ extension HomeView {
     ScrollView(.horizontal, showsIndicators: false) {
         LazyHGrid(rows: rows, alignment: .center) {
           ForEach(self.presenter.trending, id: \.id) { trending in
-            self.presenter.linkBuilder(for: trending) {
+            self.presenter.linkBuilder(for: trending, destination: { game in
+              AnyView(LazyView(HomeRouter().makeDetailView(for: game)))
+            }) {
               GameCardView(game: trending)
                   .padding()
                   .frame(width: UIScreen.main.bounds.width)
@@ -113,7 +115,9 @@ extension HomeView {
   var allGamesView: some View {
     LazyVGrid(columns: columns, alignment: .center) {
       ForEach(self.presenter.games) { game in
-        self.presenter.linkBuilder(for: game) {
+        self.presenter.linkBuilder(for: game, destination: { linkedGame in
+          AnyView(LazyView(HomeRouter().makeDetailView(for: linkedGame)))
+        }) {
           GameCardView(game: game)
               .padding()
               .frame(height: UIScreen.main.bounds.height/3)

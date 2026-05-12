@@ -61,8 +61,17 @@ jobs:
           mkdir -p coverage
 
           if [ -d "TestResults.xcresult" ]; then
-            xcrun xccov view --report TestResults.xcresult > coverage/coverage.txt
-            xcrun xccov view --report --json TestResults.xcresult > coverage/coverage.json
+            if xcrun xccov view --report TestResults.xcresult > coverage/coverage.txt; then
+              :
+            else
+              echo "Failed to generate text coverage report." > coverage/coverage.txt
+            fi
+
+            if xcrun xccov view --report --json TestResults.xcresult > coverage/coverage.json; then
+              :
+            else
+              echo "{}" > coverage/coverage.json
+            fi
 
             python3 - <<'PY'
 import json
@@ -72,16 +81,25 @@ coverage_json_path = Path("coverage/coverage.json")
 summary_path = Path("coverage/summary.md")
 
 data = json.loads(coverage_json_path.read_text())
-target = next((t for t in data.get("targets", []) if t.get("name") == "DeltaGames.app"), None)
+targets = data.get("targets", [])
+target = next((t for t in targets if t.get("name") == "DeltaGames.app"), None)
+if target is None:
+    candidates = [
+        t for t in targets
+        if "test" not in str(t.get("name", "")).lower()
+    ]
+    target = max(candidates, key=lambda t: t.get("executableLines", 0), default=None)
 
 lines = ["# Coverage Summary", ""]
 if not target:
-    lines.append("DeltaGames.app target not found in coverage report.")
+    lines.append("No eligible app target found in coverage report.")
 else:
+    target_name = target.get("name", "unknown")
     overall = target.get("lineCoverage", 0.0) * 100
     files = target.get("files", [])
     low = sorted(files, key=lambda f: f.get("lineCoverage", 0.0))[:10]
 
+    lines.append(f"Target: {target_name}")
     lines.append(f"Overall line coverage: {overall:.2f}%")
     lines.append("")
     lines.append("## Lowest Coverage Files (Top 10)")
@@ -96,8 +114,11 @@ else:
 summary_path.write_text("\n".join(lines) + "\n")
 print("\n".join(lines))
 PY
+
+            cat coverage/summary.md >> "$GITHUB_STEP_SUMMARY"
           else
             echo "TestResults.xcresult not found. Skipping coverage extraction." | tee coverage/summary.md
+            cat coverage/summary.md >> "$GITHUB_STEP_SUMMARY"
           fi
 
       - name: Upload Coverage Artifacts

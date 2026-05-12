@@ -15,6 +15,7 @@ struct FavoriteChange {
 
 @MainActor
 final class DetailPresenter: ObservableObject {
+  private static let favoritesDidChangeNotification = Notification.Name("favoritesDidChange")
   private var cancellables: Set<AnyCancellable> = []
   private let detailUseCase: DetailUseCase
   private let id: String
@@ -92,7 +93,7 @@ final class DetailPresenter: ObservableObject {
           self?.isFav = isFavGame
           guard let self, isFavGame else { return }
           self.favoriteChange = FavoriteChange(game: self.game, isFavorite: true)
-          NotificationCenter.default.post(name: .favoritesDidChange, object: nil)
+          NotificationCenter.default.post(name: Self.favoritesDidChangeNotification, object: nil)
         }
       )
         .store(in: &cancellables)
@@ -112,7 +113,7 @@ final class DetailPresenter: ObservableObject {
           guard let self else { return }
           self.isFav = false
           self.favoriteChange = FavoriteChange(game: self.game, isFavorite: false)
-          NotificationCenter.default.post(name: .favoritesDidChange, object: nil)
+          NotificationCenter.default.post(name: Self.favoritesDidChangeNotification, object: nil)
         }
       )
         .store(in: &cancellables)

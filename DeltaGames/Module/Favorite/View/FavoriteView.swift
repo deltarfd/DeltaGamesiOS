@@ -59,7 +59,9 @@ extension FavoriteView {
   var favGameView: some View {
     LazyVGrid(columns: columns, alignment: .center) {
       ForEach(presenter.favGames) { game in
-        self.presenter.linkBuilder(for: game) {
+      self.presenter.linkBuilder(for: game, destination: { linkedGame, onDismiss in
+        AnyView(LazyView(FavoriteRouter().makeDetailView(for: linkedGame, onDismiss: onDismiss)))
+      }) {
             GameCardView(game: game)
                 .padding()
                 .frame(height: UIScreen.main.bounds.height/3)

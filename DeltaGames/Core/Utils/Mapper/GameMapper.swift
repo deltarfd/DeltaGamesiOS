@@ -22,14 +22,14 @@ final class GameMapper {
     gameEntity.rating = gameModel.rating ?? 0
     gameEntity.ratingTop = gameModel.ratingTop ?? 0
     gameEntity.ratingsCount = gameModel.ratingsCount ?? 0
-    for platform in gameModel.parentPlatforms! {
+    for platform in gameModel.parentPlatforms ?? [] {
       gameEntity.parentPlatforms.append(platform.platform.name)
     }
-    for genre in gameModel.genres! {
+    for genre in gameModel.genres ?? [] {
         gameEntity.genres.append(genre.name)
     }
-    for tag in gameModel.tags! {
-        gameEntity.genres.append(tag.name)
+    for tag in gameModel.tags ?? [] {
+      gameEntity.tags.append(tag.name)
     }
     return gameEntity
   }

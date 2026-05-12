@@ -11,7 +11,6 @@ import Combine
 @MainActor
 final class HomePresenter: ObservableObject {
   private var cancellables: Set<AnyCancellable> = []
-  private let router = HomeRouter()
   private let homeUseCase: HomeUseCase
   private var hasLoaded = false
   
@@ -79,11 +78,13 @@ final class HomePresenter: ObservableObject {
 
   func linkBuilder<Content: View>(
     for game: GameModel,
+    destination: @escaping (GameModel) -> AnyView,
     @ViewBuilder detailView: () -> Content
   ) -> some View {
-    NavigationLink(
-      destination: LazyView(self.router.makeDetailView(for: game))
+    return AnyView(NavigationLink(
+      destination: destination(game)
     ) { detailView() }
+    )
   }
 
 }

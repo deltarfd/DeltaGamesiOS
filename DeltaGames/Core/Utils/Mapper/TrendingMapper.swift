@@ -29,7 +29,7 @@ final class TrendingMapper {
           gameEntity.genres.append(genre.name)
       }
       for tag in result.tags! {
-          gameEntity.genres.append(tag.name)
+          gameEntity.tags.append(tag.name)
       }
       return gameEntity
     }

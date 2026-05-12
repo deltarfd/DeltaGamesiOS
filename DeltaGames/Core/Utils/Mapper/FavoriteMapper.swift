@@ -48,14 +48,14 @@ final class FavoriteMapper {
     favEntity.rating = gameModel.rating ?? 0
     favEntity.ratingTop = gameModel.ratingTop ?? 0
     favEntity.ratingsCount = gameModel.ratingsCount ?? 0
-    for platform in gameModel.parentPlatforms! {
+    for platform in gameModel.parentPlatforms ?? [] {
       favEntity.parentPlatforms.append(platform.platform.name)
     }
-    for genre in gameModel.genres! {
+    for genre in gameModel.genres ?? [] {
       favEntity.genres.append(genre.name)
     }
-    for tag in gameModel.tags! {
-      favEntity.genres.append(tag.name)
+    for tag in gameModel.tags ?? [] {
+      favEntity.tags.append(tag.name)
     }
     return favEntity
   }

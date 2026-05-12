@@ -7,28 +7,77 @@
 
 import Foundation
 
+enum APIKeyResolveError: Error, Equatable {
+  case missingPlist
+  case missingAPIKey
+  case placeholderValue
+}
+
 struct API {
   static let baseUrl = "https://api.rawg.io/api/games"
-  static var apiKey: String {
-    // Check environment variable first (for CI/CD pipelines)
-    if let envKey = ProcessInfo.processInfo.environment["RAWG_API_KEY"], !envKey.isEmpty {
+
+  static var environmentProvider: () -> [String: String] = {
+    ProcessInfo.processInfo.environment
+  }
+  static var plistPathProvider: () -> String? = {
+    Bundle.main.path(forResource: "RawgAPI", ofType: "plist")
+  }
+  static var plistValueProvider: (String) -> String? = { filePath in
+    let plist = NSDictionary(contentsOfFile: filePath)
+    return plist?.object(forKey: "API_KEY") as? String
+  }
+  static var fatalErrorHandler: (String, StaticString, UInt) -> Never = { message, file, line in
+    Swift.fatalError(message, file: file, line: line)
+  }
+
+  static func resetTestingHooks() {
+    environmentProvider = {
+      ProcessInfo.processInfo.environment
+    }
+    plistPathProvider = {
+      Bundle.main.path(forResource: "RawgAPI", ofType: "plist")
+    }
+    plistValueProvider = { filePath in
+      let plist = NSDictionary(contentsOfFile: filePath)
+      return plist?.object(forKey: "API_KEY") as? String
+    }
+    fatalErrorHandler = { message, file, line in
+      Swift.fatalError(message, file: file, line: line)
+    }
+  }
+
+  static func resolveAPIKey() throws -> String {
+    if let envKey = environmentProvider()["RAWG_API_KEY"], !envKey.isEmpty {
       return envKey
     }
-    
-    // Fall back to plist for local development
-    guard let filePath = Bundle.main.path(forResource: "RawgAPI", ofType: "plist") else {
-      fatalError("Couldn't find file 'RawgAPI.plist'. Set RAWG_API_KEY environment variable or ensure RawgAPI.plist exists.")
+
+    guard let filePath = plistPathProvider() else {
+      throw APIKeyResolveError.missingPlist
     }
-    
-    let plist = NSDictionary(contentsOfFile: filePath)
-    guard let value = plist?.object(forKey: "API_KEY") as? String else {
-      fatalError("Couldn't find key 'API_KEY' in 'RawgAPI.plist'. Set RAWG_API_KEY environment variable or add API_KEY to plist.")
+
+    guard let value = plistValueProvider(filePath) else {
+      throw APIKeyResolveError.missingAPIKey
     }
-    
+
     if value.starts(with: "_") || value.isEmpty {
-      fatalError("API key not configured. Register for a RAWG developer account and get an API key at https://rawg.io/apidocs, then set RAWG_API_KEY environment variable or update RawgAPI.plist.")
+      throw APIKeyResolveError.placeholderValue
     }
+
     return value
+  }
+
+  static var apiKey: String {
+    do {
+      return try resolveAPIKey()
+    } catch APIKeyResolveError.missingPlist {
+      fatalErrorHandler("Couldn't find file 'RawgAPI.plist'. Set RAWG_API_KEY environment variable or ensure RawgAPI.plist exists.", #filePath, #line)
+    } catch APIKeyResolveError.missingAPIKey {
+      fatalErrorHandler("Couldn't find key 'API_KEY' in 'RawgAPI.plist'. Set RAWG_API_KEY environment variable or add API_KEY to plist.", #filePath, #line)
+    } catch APIKeyResolveError.placeholderValue {
+      fatalErrorHandler("API key not configured. Register for a RAWG developer account and get an API key at https://rawg.io/apidocs, then set RAWG_API_KEY environment variable or update RawgAPI.plist.", #filePath, #line)
+    } catch {
+      fatalErrorHandler("Unexpected API key configuration error.", #filePath, #line)
+    }
   }
 }
 

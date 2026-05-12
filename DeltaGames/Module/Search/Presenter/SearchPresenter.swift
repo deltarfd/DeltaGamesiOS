@@ -11,7 +11,6 @@ import Combine
 @MainActor
 final class SearchPresenter: ObservableObject {
   private var cancellables: Set<AnyCancellable> = []
-  private let router = SearchRouter()
   private let searchUseCase: SearchUseCase
 
   @Published var searchGames: [GameModel] = []
@@ -77,11 +76,13 @@ final class SearchPresenter: ObservableObject {
   
   func linkBuilder<Content: View>(
     for game: GameModel,
+    destination: @escaping (GameModel) -> AnyView,
     @ViewBuilder content: () -> Content
   ) -> some View {
-    NavigationLink(
-      destination: LazyView(self.router.makeDetailView(for: game))
+    return AnyView(NavigationLink(
+      destination: destination(game)
     ) { content() }
+    )
   }
 
 }
