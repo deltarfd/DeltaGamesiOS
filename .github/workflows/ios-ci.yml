@@ -14,6 +14,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
+      - name: Prepare RAWG API Key Config
+        env:
+          RAWG_API_KEY: ${{ secrets.RAWG_API_KEY || vars.RAWG_API_KEY }}
+        run: |
+          if [ -z "${RAWG_API_KEY:-}" ]; then
+            echo "RAWG_API_KEY is missing from GitHub secrets/vars."
+            echo "If this is a pull_request from a fork, secrets are not exposed."
+            exit 1
+          fi
+
+          /usr/libexec/PlistBuddy -c "Set :API_KEY $RAWG_API_KEY" DeltaGames/Resources/RawgAPI.plist \
+            || /usr/libexec/PlistBuddy -c "Add :API_KEY string $RAWG_API_KEY" DeltaGames/Resources/RawgAPI.plist
+
       - name: Select Latest Stable Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
@@ -32,7 +45,7 @@ jobs:
 
       - name: Build App
         env:
-          RAWG_API_KEY: ${{ secrets.RAWG_API_KEY }}
+          RAWG_API_KEY: ${{ secrets.RAWG_API_KEY || vars.RAWG_API_KEY }}
         run: |
           xcodebuild \
             -workspace DeltaGames.xcworkspace \
@@ -60,7 +73,7 @@ jobs:
 
       - name: Run App Tests (includes SPM dependencies)
         env:
-          RAWG_API_KEY: ${{ secrets.RAWG_API_KEY }}
+          RAWG_API_KEY: ${{ secrets.RAWG_API_KEY || vars.RAWG_API_KEY }}
         run: |
           xcodebuild \
             -workspace DeltaGames.xcworkspace \
