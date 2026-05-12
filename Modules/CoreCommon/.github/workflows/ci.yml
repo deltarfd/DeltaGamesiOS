@@ -26,12 +26,15 @@ jobs:
       - name: Export LCOV
         run: |
           set -euo pipefail
-          PROFDATA=$(find .build -name "*.profdata" | head -1)
-          TEST_BUNDLE=$(find .build -name "*.xctest" | head -1)
-          TEST_BINARY=$(find "$TEST_BUNDLE/Contents/MacOS" -type f | head -1)
+          PROFDATA=$(find .build -path "*/debug/codecov/*.profdata" -type f | head -1)
+          TEST_BINARY=$(find .build -path "*/debug/CoreCommonPackageTests.xctest/Contents/MacOS/CoreCommonPackageTests" -type f | head -1)
 
-          if [ -z "$PROFDATA" ] || [ -z "$TEST_BUNDLE" ] || [ -z "$TEST_BINARY" ]; then
+          if [ -z "$PROFDATA" ] || [ -z "$TEST_BINARY" ]; then
             echo "Coverage artifacts not found"
+            echo "Found profdata files:"
+            find .build -path "*/debug/codecov/*.profdata" -type f || true
+            echo "Found test executables:"
+            find .build -path "*/Contents/MacOS/*" -type f || true
             exit 1
           fi
 
