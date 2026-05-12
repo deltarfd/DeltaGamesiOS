@@ -9,9 +9,6 @@ on:
 jobs:
   lint-build:
     runs-on: macos-latest
-    env:
-      RAWG_API_KEY_SECRET: ${{ secrets.RAWG_API_KEY }}
-      RAWG_API_KEY_VAR: ${{ vars.RAWG_API_KEY }}
 
     steps:
       - name: Checkout
@@ -34,12 +31,9 @@ jobs:
         run: swiftlint lint --config .swiftlint.yml DeltaGames
 
       - name: Build App
+        env:
+          RAWG_API_KEY: ${{ secrets.RAWG_API_KEY }}
         run: |
-          RESOLVED_RAWG_API_KEY="${RAWG_API_KEY_SECRET:-${RAWG_API_KEY_VAR:-}}"
-          if [ -n "$RESOLVED_RAWG_API_KEY" ]; then
-            export RAWG_API_KEY="$RESOLVED_RAWG_API_KEY"
-          fi
-
           xcodebuild \
             -workspace DeltaGames.xcworkspace \
             -scheme DeltaGames \
@@ -65,23 +59,9 @@ jobs:
           echo "IOS_DESTINATION=platform=iOS Simulator,id=$SIM_ID" >> "$GITHUB_ENV"
 
       - name: Run App Tests (includes SPM dependencies)
+        env:
+          RAWG_API_KEY: ${{ secrets.RAWG_API_KEY }}
         run: |
-          RESOLVED_RAWG_API_KEY="${RAWG_API_KEY_SECRET:-${RAWG_API_KEY_VAR:-}}"
-          if [ -z "$RESOLVED_RAWG_API_KEY" ]; then
-            PLIST_KEY=$(/usr/libexec/PlistBuddy -c "Print API_KEY" DeltaGames/Resources/RawgAPI.plist 2>/dev/null || true)
-            if [ -n "$PLIST_KEY" ] && [[ "$PLIST_KEY" != _* ]]; then
-              RESOLVED_RAWG_API_KEY="$PLIST_KEY"
-            fi
-          fi
-
-          if [ -z "$RESOLVED_RAWG_API_KEY" ]; then
-            echo "RAWG_API_KEY is not available from GitHub secrets/vars or RawgAPI.plist."
-            echo "If this runs on pull_request from a fork, secrets are not exposed by GitHub."
-            exit 1
-          fi
-
-          export RAWG_API_KEY="$RESOLVED_RAWG_API_KEY"
-
           xcodebuild \
             -workspace DeltaGames.xcworkspace \
             -scheme DeltaGames \
