@@ -74,46 +74,46 @@ jobs:
             fi
 
             python3 - <<'PY'
-import json
-from pathlib import Path
+            import json
+            from pathlib import Path
 
-coverage_json_path = Path("coverage/coverage.json")
-summary_path = Path("coverage/summary.md")
+            coverage_json_path = Path("coverage/coverage.json")
+            summary_path = Path("coverage/summary.md")
 
-data = json.loads(coverage_json_path.read_text())
-targets = data.get("targets", [])
-target = next((t for t in targets if t.get("name") == "DeltaGames.app"), None)
-if target is None:
-    candidates = [
-        t for t in targets
-        if "test" not in str(t.get("name", "")).lower()
-    ]
-    target = max(candidates, key=lambda t: t.get("executableLines", 0), default=None)
+            data = json.loads(coverage_json_path.read_text())
+            targets = data.get("targets", [])
+            target = next((t for t in targets if t.get("name") == "DeltaGames.app"), None)
+            if target is None:
+              candidates = [
+                t for t in targets
+                if "test" not in str(t.get("name", "")).lower()
+              ]
+              target = max(candidates, key=lambda t: t.get("executableLines", 0), default=None)
 
-lines = ["# Coverage Summary", ""]
-if not target:
-    lines.append("No eligible app target found in coverage report.")
-else:
-    target_name = target.get("name", "unknown")
-    overall = target.get("lineCoverage", 0.0) * 100
-    files = target.get("files", [])
-    low = sorted(files, key=lambda f: f.get("lineCoverage", 0.0))[:10]
+            lines = ["# Coverage Summary", ""]
+            if not target:
+              lines.append("No eligible app target found in coverage report.")
+            else:
+              target_name = target.get("name", "unknown")
+              overall = target.get("lineCoverage", 0.0) * 100
+              files = target.get("files", [])
+              low = sorted(files, key=lambda f: f.get("lineCoverage", 0.0))[:10]
 
-    lines.append(f"Target: {target_name}")
-    lines.append(f"Overall line coverage: {overall:.2f}%")
-    lines.append("")
-    lines.append("## Lowest Coverage Files (Top 10)")
-    lines.append("")
-    lines.append("| File | Coverage |")
-    lines.append("| --- | ---: |")
-    for f in low:
-      name = f.get("name", "unknown")
-      pct = f.get("lineCoverage", 0.0) * 100
-      lines.append(f"| {name} | {pct:.2f}% |")
+              lines.append(f"Target: {target_name}")
+              lines.append(f"Overall line coverage: {overall:.2f}%")
+              lines.append("")
+              lines.append("## Lowest Coverage Files (Top 10)")
+              lines.append("")
+              lines.append("| File | Coverage |")
+              lines.append("| --- | ---: |")
+              for f in low:
+                name = f.get("name", "unknown")
+                pct = f.get("lineCoverage", 0.0) * 100
+                lines.append(f"| {name} | {pct:.2f}% |")
 
-summary_path.write_text("\n".join(lines) + "\n")
-print("\n".join(lines))
-PY
+            summary_path.write_text("\n".join(lines) + "\n")
+            print("\n".join(lines))
+            PY
 
             cat coverage/summary.md >> "$GITHUB_STEP_SUMMARY"
           else
