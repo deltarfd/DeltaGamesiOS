@@ -139,6 +139,16 @@ jobs:
             cat coverage/summary.md >> "$GITHUB_STEP_SUMMARY"
           fi
 
+      - name: Upload Coverage to Codecov
+        if: always() && hashFiles('coverage/coverage.json') != ''
+        uses: codecov/codecov-action@v5
+        with:
+          files: coverage/coverage.json
+          flags: ios
+          fail_ci_if_error: false
+          verbose: true
+          token: ${{ secrets.CODECOV_TOKEN || vars.CODECOV_TOKEN }}
+
       - name: Upload Coverage Artifacts
         if: always()
         uses: actions/upload-artifact@v5
