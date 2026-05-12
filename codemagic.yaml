@@ -13,6 +13,8 @@ workflows:
     environment:
       xcode: latest
       cocoapods: default
+      groups:
+        - "RAWG API"
     scripts:
       - name: Install Pods
         script: |

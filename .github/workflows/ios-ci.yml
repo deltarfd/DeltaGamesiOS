@@ -9,6 +9,7 @@ on:
 jobs:
   lint-build:
     runs-on: macos-latest
+    environment: RAWG_API_KEY
 
     steps:
       - name: Checkout
