@@ -44,15 +44,15 @@ jobs:
 
       - name: Detect Available iOS Simulator
         run: |
-          SIM_NAME=$(xcrun simctl list devices available | awk -F '[()]' '/iPhone/ && $0 !~ /unavailable/ {gsub(/^ +/, "", $1); print $1; exit}')
-          if [ -z "$SIM_NAME" ]; then
+          SIM_ID=$(xcrun simctl list devices available | grep "iPhone" | grep -v "unavailable" | head -1 | awk '{print $NF}' | tr -d '{} ')
+          if [ -z "$SIM_ID" ]; then
             echo "No available iPhone simulator found on this runner."
             xcrun simctl list devices available
             exit 1
           fi
 
-          echo "Using simulator: $SIM_NAME"
-          echo "IOS_DESTINATION=platform=iOS Simulator,name=$SIM_NAME" >> "$GITHUB_ENV"
+          echo "Using simulator: $SIM_ID"
+          echo "IOS_DESTINATION=platform=iOS Simulator,id=$SIM_ID" >> "$GITHUB_ENV"
 
       - name: Run App Tests (includes SPM dependencies)
         env:

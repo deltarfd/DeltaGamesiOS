@@ -28,8 +28,12 @@ workflows:
           swiftlint lint --config .swiftlint.yml DeltaGames
       - name: Run App Tests (includes SPM dependencies)
         script: |
-          export RAWG_API_KEY="$RAWG_API_KEY"
-          SIM_ID=$(xcrun simctl list devices available | awk -F '[()]' '/iPhone/ && ($0 ~ /Shutdown|Booted/) {print $2; exit}')
+          if [ -z "$RAWG_API_KEY" ]; then
+            echo "WARNING: RAWG_API_KEY not set. Tests will likely fail."
+            echo "Set RAWG_API_KEY in Codemagic dashboard > Project Settings > Environment variables"
+          fi
+          
+          SIM_ID=$(xcrun simctl list devices available | grep "iPhone" | head -1 | awk '{print $NF}' | tr -d '{} ')
           if [ -z "$SIM_ID" ]; then
             echo "No available iPhone simulator found on Codemagic machine"
             xcrun simctl list devices available
