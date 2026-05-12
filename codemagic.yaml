@@ -13,9 +13,6 @@ workflows:
     environment:
       xcode: latest
       cocoapods: default
-      vars:
-        # Set RAWG_API_KEY in Codemagic dashboard > Project Settings > Environment variables
-        RAWG_API_KEY: $RAWG_API_KEY
     scripts:
       - name: Install Pods
         script: |
@@ -28,17 +25,22 @@ workflows:
           swiftlint lint --config .swiftlint.yml DeltaGames
       - name: Run App Tests (includes SPM dependencies)
         script: |
-          if [ -z "$RAWG_API_KEY" ]; then
-            echo "WARNING: RAWG_API_KEY not set. Tests will likely fail."
+          if [ -z "${RAWG_API_KEY:-}" ]; then
+            echo "RAWG_API_KEY is not set in Codemagic environment variables."
             echo "Set RAWG_API_KEY in Codemagic dashboard > Project Settings > Environment variables"
+            exit 1
           fi
+
+          SIM_ID=$(xcrun simctl list devices available --json | python3 -c 'import json,sys;d=json.load(sys.stdin).get("devices",{});pref=["iPhone 17 Pro Max","iPhone 17 Pro","iPhone 17","iPhone 17e","iPhone 16e","iPhone Air"];c=[dev for rt,arr in d.items() if "iOS" in rt for dev in arr if dev.get("isAvailable") and dev.get("name","").startswith("iPhone")];print(next((dev.get("udid","") for n in pref for dev in c if dev.get("name")==n),(c[0].get("udid","") if c else "")))')
           
-          SIM_ID=$(xcrun simctl list devices available | grep "iPhone" | head -1 | sed -E 's/.*id:([^,]+).*/\1/')
-          if [ -z "$SIM_ID" ] || [ "$SIM_ID" = "(Shutdown)" ]; then
+          if [ -z "$SIM_ID" ]; then
             echo "No available iPhone simulator found on Codemagic machine"
             xcrun simctl list devices available
             exit 1
           fi
+
+          xcrun simctl boot "$SIM_ID" || true
+          xcrun simctl bootstatus "$SIM_ID" -b
 
           echo "Using simulator ID: $SIM_ID"
           xcodebuild \
