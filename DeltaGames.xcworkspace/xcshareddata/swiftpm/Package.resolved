@@ -1,0 +1,24 @@
+{
+  "originHash" : "6c5b0f2f34cab91dc03a8fc19e1cb73022882867a0359212bc2587e01ff81cbf",
+  "pins" : [
+    {
+      "identity" : "deltagamesios-corecommon",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/deltarfd/DeltaGamesiOS-CoreCommon.git",
+      "state" : {
+        "revision" : "21dd7dad64807b35e2d1721c58b82439a1209d0c",
+        "version" : "1.0.1"
+      }
+    },
+    {
+      "identity" : "deltagamesios-features",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/deltarfd/DeltaGamesiOS-Features",
+      "state" : {
+        "revision" : "df916a4dfcb88856ba1b99ffdb60d88ddba3a1f2",
+        "version" : "1.0.0"
+      }
+    }
+  ],
+  "version" : 3
+}

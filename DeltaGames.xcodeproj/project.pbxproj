@@ -54,7 +54,6 @@
 		5DA01956273AA7A700A943A6 /* RemoteDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DA01955273AA7A700A943A6 /* RemoteDataSource.swift */; };
 		5DA01959273AA7FC00A943A6 /* GamesRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DA01958273AA7FC00A943A6 /* GamesRepository.swift */; };
 		5DA73AB5270720C100842E51 /* GameCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DA73AB4270720C100842E51 /* GameCardView.swift */; };
-		9F4A7C2E4B1D4E5F8A9B0C1D /* RemoteImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4A7C2D4B1D4E5F8A9B0C1D /* RemoteImageView.swift */; };
 		5DB186E6270DA30F004BD9CD /* FavoriteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DB186E5270DA30F004BD9CD /* FavoriteView.swift */; };
 		5DE8B8B52763C566008ABD4C /* TrendingMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DE8B8B42763C566008ABD4C /* TrendingMapper.swift */; };
 		5DF9698E273A08310017937F /* GameEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DF9698D273A08310017937F /* GameEntity.swift */; };
@@ -66,9 +65,15 @@
 		5DFAA527274BBCD1008B39A0 /* FavoriteModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DFAA526274BBCD1008B39A0 /* FavoriteModel.swift */; };
 		5DFAA52A274BBD04008B39A0 /* SearchModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DFAA529274BBD03008B39A0 /* SearchModel.swift */; };
 		6E6B4BC410C51FDF0787C278 /* Pods_DeltaGames.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A284F3621B1B74216C768DAE /* Pods_DeltaGames.framework */; };
+		9F4A7C2E4B1D4E5F8A9B0C1D /* RemoteImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4A7C2D4B1D4E5F8A9B0C1D /* RemoteImageView.swift */; };
 		AA000001273B376C00518E55 /* Double+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000002273B376C00518E55 /* Double+Ext.swift */; };
 		AA000003273B376C00518E55 /* Color+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000004273B376C00518E55 /* Color+Ext.swift */; };
 		AA000005273B376C00518E55 /* String+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000006273B376C00518E55 /* String+Ext.swift */; };
+		C269024E2FB32F44003F000B /* DetailFeature in Frameworks */ = {isa = PBXBuildFile; productRef = C269024D2FB32F44003F000B /* DetailFeature */; };
+		C26902502FB32F44003F000B /* FavoriteFeature in Frameworks */ = {isa = PBXBuildFile; productRef = C269024F2FB32F44003F000B /* FavoriteFeature */; };
+		C26902522FB32F44003F000B /* HomeFeature in Frameworks */ = {isa = PBXBuildFile; productRef = C26902512FB32F44003F000B /* HomeFeature */; };
+		C26902542FB32F44003F000B /* ProfileFeature in Frameworks */ = {isa = PBXBuildFile; productRef = C26902532FB32F44003F000B /* ProfileFeature */; };
+		C26902562FB32F44003F000B /* SearchFeature in Frameworks */ = {isa = PBXBuildFile; productRef = C26902552FB32F44003F000B /* SearchFeature */; };
 		C2999D912FAAF6E4003A18B2 /* LazyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2999D902FAAF6E4003A18B2 /* LazyView.swift */; };
 /* End PBXBuildFile section */
 
@@ -123,7 +128,6 @@
 		5DA01955273AA7A700A943A6 /* RemoteDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteDataSource.swift; sourceTree = "<group>"; };
 		5DA01958273AA7FC00A943A6 /* GamesRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GamesRepository.swift; sourceTree = "<group>"; };
 		5DA73AB4270720C100842E51 /* GameCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCardView.swift; sourceTree = "<group>"; };
-		9F4A7C2D4B1D4E5F8A9B0C1D /* RemoteImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteImageView.swift; sourceTree = "<group>"; };
 		5DB186E5270DA30F004BD9CD /* FavoriteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteView.swift; sourceTree = "<group>"; };
 		5DE8B8B42763C566008ABD4C /* TrendingMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendingMapper.swift; sourceTree = "<group>"; };
 		5DF9698D273A08310017937F /* GameEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameEntity.swift; sourceTree = "<group>"; };
@@ -135,6 +139,7 @@
 		5DFAA526274BBCD1008B39A0 /* FavoriteModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteModel.swift; sourceTree = "<group>"; };
 		5DFAA529274BBD03008B39A0 /* SearchModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchModel.swift; sourceTree = "<group>"; };
 		87E9DAE692E70A5B87864DA2 /* Pods-DeltaGames.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DeltaGames.debug.xcconfig"; path = "Target Support Files/Pods-DeltaGames/Pods-DeltaGames.debug.xcconfig"; sourceTree = "<group>"; };
+		9F4A7C2D4B1D4E5F8A9B0C1D /* RemoteImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteImageView.swift; sourceTree = "<group>"; };
 		A284F3621B1B74216C768DAE /* Pods_DeltaGames.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DeltaGames.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA000002273B376C00518E55 /* Double+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Double+Ext.swift"; sourceTree = "<group>"; };
 		AA000004273B376C00518E55 /* Color+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Ext.swift"; sourceTree = "<group>"; };
@@ -147,7 +152,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C26902522FB32F44003F000B /* HomeFeature in Frameworks */,
+				C269024E2FB32F44003F000B /* DetailFeature in Frameworks */,
 				6E6B4BC410C51FDF0787C278 /* Pods_DeltaGames.framework in Frameworks */,
+				C26902502FB32F44003F000B /* FavoriteFeature in Frameworks */,
+				C26902542FB32F44003F000B /* ProfileFeature in Frameworks */,
+				C26902562FB32F44003F000B /* SearchFeature in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -602,6 +612,9 @@
 				Base,
 			);
 			mainGroup = 5D5310442706E043000D4A8B;
+			packageReferences = (
+				C269024C2FB32EF3003F000B /* XCRemoteSwiftPackageReference "DeltaGamesiOS-Features" */,
+			);
 			productRefGroup = 5D53104E2706E043000D4A8B /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -656,9 +669,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-DeltaGames/Pods-DeltaGames-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-DeltaGames/Pods-DeltaGames-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -946,6 +963,45 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		C269024C2FB32EF3003F000B /* XCRemoteSwiftPackageReference "DeltaGamesiOS-Features" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/deltarfd/DeltaGamesiOS-Features";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C269024D2FB32F44003F000B /* DetailFeature */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C269024C2FB32EF3003F000B /* XCRemoteSwiftPackageReference "DeltaGamesiOS-Features" */;
+			productName = DetailFeature;
+		};
+		C269024F2FB32F44003F000B /* FavoriteFeature */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C269024C2FB32EF3003F000B /* XCRemoteSwiftPackageReference "DeltaGamesiOS-Features" */;
+			productName = FavoriteFeature;
+		};
+		C26902512FB32F44003F000B /* HomeFeature */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C269024C2FB32EF3003F000B /* XCRemoteSwiftPackageReference "DeltaGamesiOS-Features" */;
+			productName = HomeFeature;
+		};
+		C26902532FB32F44003F000B /* ProfileFeature */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C269024C2FB32EF3003F000B /* XCRemoteSwiftPackageReference "DeltaGamesiOS-Features" */;
+			productName = ProfileFeature;
+		};
+		C26902552FB32F44003F000B /* SearchFeature */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C269024C2FB32EF3003F000B /* XCRemoteSwiftPackageReference "DeltaGamesiOS-Features" */;
+			productName = SearchFeature;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 5D5310452706E043000D4A8B /* Project object */;
 }

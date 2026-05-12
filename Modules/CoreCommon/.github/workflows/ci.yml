@@ -1,0 +1,58 @@
+name: CoreCommon CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test-and-coverage:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Select Xcode
+        run: sudo xcode-select -switch /Applications/Xcode.app
+
+      - name: Swift Build
+        run: swift build
+
+      - name: Swift Test with Coverage
+        run: swift test --enable-code-coverage
+
+      - name: Export LCOV
+        run: |
+          set -euo pipefail
+          PROFDATA=$(find .build -name "*.profdata" | head -1)
+          TEST_BUNDLE=$(find .build -name "*.xctest" | head -1)
+          TEST_BINARY=$(find "$TEST_BUNDLE/Contents/MacOS" -type f | head -1)
+
+          if [ -z "$PROFDATA" ] || [ -z "$TEST_BUNDLE" ] || [ -z "$TEST_BINARY" ]; then
+            echo "Coverage artifacts not found"
+            exit 1
+          fi
+
+          xcrun llvm-cov export \
+            -format=lcov \
+            -instr-profile="$PROFDATA" \
+            --ignore-filename-regex="Tests|\.build" \
+            "$TEST_BINARY" > coverage.lcov
+
+          echo "Generated LCOV lines: $(wc -l < coverage.lcov)"
+
+      - name: Upload Coverage Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: corecommon-coverage
+          path: coverage.lcov
+
+      - name: Upload to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: coverage.lcov
+          flags: corecommon
+          fail_ci_if_error: false
+          verbose: true

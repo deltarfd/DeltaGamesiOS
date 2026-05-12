@@ -6,6 +6,11 @@
 //
 
 import SwiftUI
+import HomeFeature
+import DetailFeature
+import FavoriteFeature
+import SearchFeature
+import ProfileFeature
 
 struct MainView: View {
 
