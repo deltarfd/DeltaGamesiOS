@@ -40,73 +40,75 @@ jobs:
             -derivedDataPath DerivedData \
             clean build
 
-      - name: Run CoreCommon Tests
+      - name: Run App Tests (includes SPM dependencies)
         env:
           RAWG_API_KEY: ${{ secrets.RAWG_API_KEY }}
         run: |
-          cd Modules/CoreCommon
-          swift test --enable-code-coverage
-          PROFDATA=$(find .build/debug/codecov -name "*.profdata" | head -1)
-          BINARY=".build/debug/CoreCommonPackageTests.xctest/Contents/MacOS/CoreCommonPackageTests"
-          echo "PROFDATA: $PROFDATA"
-          echo "BINARY exists: $(test -f "$BINARY" && echo yes || echo no)"
-          if [ -n "$PROFDATA" ] && [ -f "$BINARY" ]; then
-            xcrun llvm-cov export \
-              -format=lcov \
-              -instr-profile="$PROFDATA" \
-              --ignore-filename-regex="\.build|Tests" \
-              "$BINARY" > coverage-corecommon.lcov
-            echo "Generated $(wc -l < coverage-corecommon.lcov) lines of LCOV"
-          else
-            echo "Skipping LCOV: profdata=$PROFDATA binary=$BINARY"
-            # List what's available for debugging
-            find .build/debug -name "*.xctest" 2>/dev/null || true
-            find .build/debug/codecov -name "*.profdata" 2>/dev/null || true
-          fi
+          xcodebuild \
+            -workspace DeltaGames.xcworkspace \
+            -scheme DeltaGames \
+            -destination 'platform=iOS Simulator,name=iPhone 15' \
+            -configuration Debug \
+            -derivedDataPath DerivedData \
+            -enableCodeCoverage YES \
+            -resultBundlePath TestResults.xcresult \
+            -only-testing:DeltaGamesTests \
+            test
 
-      - name: Run Feature Modules Tests
-        env:
-          RAWG_API_KEY: ${{ secrets.RAWG_API_KEY }}
+      - name: Generate Coverage Report
+        if: always()
         run: |
-          cd Modules/Features
-          swift test --enable-code-coverage
-          PROFDATA=$(find .build/debug/codecov -name "*.profdata" | head -1)
-          BINARY=".build/debug/FeaturesPackageTests.xctest/Contents/MacOS/FeaturesPackageTests"
-          echo "PROFDATA: $PROFDATA"
-          echo "BINARY exists: $(test -f "$BINARY" && echo yes || echo no)"
-          if [ -n "$PROFDATA" ] && [ -f "$BINARY" ]; then
-            xcrun llvm-cov export \
-              -format=lcov \
-              -instr-profile="$PROFDATA" \
-              --ignore-filename-regex="\.build|Tests" \
-              "$BINARY" > coverage-features.lcov
-            echo "Generated $(wc -l < coverage-features.lcov) lines of LCOV"
+          mkdir -p coverage
+
+          if [ -d "TestResults.xcresult" ]; then
+            xcrun xccov view --report TestResults.xcresult > coverage/coverage.txt
+            xcrun xccov view --report --json TestResults.xcresult > coverage/coverage.json
+
+            python3 - <<'PY'
+import json
+from pathlib import Path
+
+coverage_json_path = Path("coverage/coverage.json")
+summary_path = Path("coverage/summary.md")
+
+data = json.loads(coverage_json_path.read_text())
+target = next((t for t in data.get("targets", []) if t.get("name") == "DeltaGames.app"), None)
+
+lines = ["# Coverage Summary", ""]
+if not target:
+    lines.append("DeltaGames.app target not found in coverage report.")
+else:
+    overall = target.get("lineCoverage", 0.0) * 100
+    files = target.get("files", [])
+    low = sorted(files, key=lambda f: f.get("lineCoverage", 0.0))[:10]
+
+    lines.append(f"Overall line coverage: {overall:.2f}%")
+    lines.append("")
+    lines.append("## Lowest Coverage Files (Top 10)")
+    lines.append("")
+    lines.append("| File | Coverage |")
+    lines.append("| --- | ---: |")
+    for f in low:
+      name = f.get("name", "unknown")
+      pct = f.get("lineCoverage", 0.0) * 100
+      lines.append(f"| {name} | {pct:.2f}% |")
+
+summary_path.write_text("\n".join(lines) + "\n")
+print("\n".join(lines))
+PY
           else
-            echo "Skipping LCOV: profdata=$PROFDATA binary=$BINARY"
-            # List what's available for debugging
-            find .build/debug -name "*.xctest" 2>/dev/null || true
-            find .build/debug/codecov -name "*.profdata" 2>/dev/null || true
+            echo "TestResults.xcresult not found. Skipping coverage extraction." | tee coverage/summary.md
           fi
 
-      - name: Upload CoreCommon Coverage
-        uses: codecov/codecov-action@v5
+      - name: Upload Coverage Artifacts
+        if: always()
+        uses: actions/upload-artifact@v5
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          flags: corecommon
-          disable_search: true
-          fail_ci_if_error: false
-          verbose: true
-          files: Modules/CoreCommon/coverage-corecommon.lcov
-
-      - name: Upload Features Coverage
-        uses: codecov/codecov-action@v5
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          flags: features
-          disable_search: true
-          fail_ci_if_error: false
-          verbose: true
-          files: Modules/Features/coverage-features.lcov
+          name: coverage-report
+          path: |
+            coverage/
+            TestResults.xcresult
+          retention-days: 30
 
       - name: Upload Build Artifacts
         if: always()
