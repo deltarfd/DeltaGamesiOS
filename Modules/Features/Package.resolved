@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/deltarfd/DeltaGamesiOS-CoreCommon.git",
       "state" : {
-        "revision" : "ae8e2d81b09e15e6e64feb56a40873edc45e0f07",
-        "version" : "1.0.0"
+        "revision" : "21dd7dad64807b35e2d1721c58b82439a1209d0c",
+        "version" : "1.0.1"
       }
     }
   ],
