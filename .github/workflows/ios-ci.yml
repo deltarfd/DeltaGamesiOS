@@ -9,7 +9,6 @@ on:
 jobs:
   lint-build:
     runs-on: macos-latest
-    environment: RAWG_API_KEY
 
     steps:
       - name: Checkout
@@ -17,7 +16,7 @@ jobs:
 
       - name: Prepare RAWG API Key Config
         env:
-          RAWG_API_KEY: ${{ secrets.RAWG_API_KEY || vars.RAWG_API_KEY }}
+          RAWG_API_KEY: ${{ secrets.RAWG_API_KEY }}
         run: |
           if [ -z "${RAWG_API_KEY:-}" ]; then
             echo "RAWG_API_KEY is missing from GitHub secrets/vars."
@@ -46,7 +45,7 @@ jobs:
 
       - name: Build App
         env:
-          RAWG_API_KEY: ${{ secrets.RAWG_API_KEY || vars.RAWG_API_KEY }}
+          RAWG_API_KEY: ${{ secrets.RAWG_API_KEY }}
         run: |
           xcodebuild \
             -workspace DeltaGames.xcworkspace \
@@ -74,7 +73,7 @@ jobs:
 
       - name: Run App Tests (includes SPM dependencies)
         env:
-          RAWG_API_KEY: ${{ secrets.RAWG_API_KEY || vars.RAWG_API_KEY }}
+          RAWG_API_KEY: ${{ secrets.RAWG_API_KEY }}
         run: |
           xcodebuild \
             -workspace DeltaGames.xcworkspace \
@@ -147,7 +146,7 @@ jobs:
           flags: ios
           fail_ci_if_error: false
           verbose: true
-          token: ${{ secrets.CODECOV_TOKEN || vars.CODECOV_TOKEN }}
+          token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Upload Coverage Artifacts
         if: always()
