@@ -14,8 +14,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Select Xcode
-        run: sudo xcode-select -switch /Applications/Xcode.app
+      - name: Select Latest Stable Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
 
       - name: Install SwiftLint
         run: brew install swiftlint
@@ -40,6 +42,18 @@ jobs:
             -derivedDataPath DerivedData \
             clean build
 
+      - name: Detect Available iOS Simulator
+        run: |
+          SIM_NAME=$(xcrun simctl list devices available | awk -F '[()]' '/iPhone/ && $0 !~ /unavailable/ {gsub(/^ +/, "", $1); print $1; exit}')
+          if [ -z "$SIM_NAME" ]; then
+            echo "No available iPhone simulator found on this runner."
+            xcrun simctl list devices available
+            exit 1
+          fi
+
+          echo "Using simulator: $SIM_NAME"
+          echo "IOS_DESTINATION=platform=iOS Simulator,name=$SIM_NAME" >> "$GITHUB_ENV"
+
       - name: Run App Tests (includes SPM dependencies)
         env:
           RAWG_API_KEY: ${{ secrets.RAWG_API_KEY }}
@@ -47,7 +61,7 @@ jobs:
           xcodebuild \
             -workspace DeltaGames.xcworkspace \
             -scheme DeltaGames \
-            -destination 'platform=iOS Simulator,name=iPhone 15' \
+            -destination "$IOS_DESTINATION" \
             -configuration Debug \
             -derivedDataPath DerivedData \
             -enableCodeCoverage YES \
@@ -73,47 +87,33 @@ jobs:
               echo "{}" > coverage/coverage.json
             fi
 
-            python3 - <<'PY'
-            import json
-            from pathlib import Path
+            APP_LINE=$(grep -E '\.app([[:space:]]|$)' coverage/coverage.txt | grep -vi test | head -n 1 || true)
+            if [ -n "$APP_LINE" ]; then
+              APP_NAME=$(echo "$APP_LINE" | awk '{$NF=""; sub(/[[:space:]]+$/, ""); print}')
+              APP_COVERAGE=$(echo "$APP_LINE" | awk '{print $NF}')
+            else
+              APP_NAME="Unknown App Target"
+              APP_COVERAGE="N/A"
+            fi
 
-            coverage_json_path = Path("coverage/coverage.json")
-            summary_path = Path("coverage/summary.md")
-
-            data = json.loads(coverage_json_path.read_text())
-            targets = data.get("targets", [])
-            target = next((t for t in targets if t.get("name") == "DeltaGames.app"), None)
-            if target is None:
-              candidates = [
-                t for t in targets
-                if "test" not in str(t.get("name", "")).lower()
-              ]
-              target = max(candidates, key=lambda t: t.get("executableLines", 0), default=None)
-
-            lines = ["# Coverage Summary", ""]
-            if not target:
-              lines.append("No eligible app target found in coverage report.")
-            else:
-              target_name = target.get("name", "unknown")
-              overall = target.get("lineCoverage", 0.0) * 100
-              files = target.get("files", [])
-              low = sorted(files, key=lambda f: f.get("lineCoverage", 0.0))[:10]
-
-              lines.append(f"Target: {target_name}")
-              lines.append(f"Overall line coverage: {overall:.2f}%")
-              lines.append("")
-              lines.append("## Lowest Coverage Files (Top 10)")
-              lines.append("")
-              lines.append("| File | Coverage |")
-              lines.append("| --- | ---: |")
-              for f in low:
-                name = f.get("name", "unknown")
-                pct = f.get("lineCoverage", 0.0) * 100
-                lines.append(f"| {name} | {pct:.2f}% |")
-
-            summary_path.write_text("\n".join(lines) + "\n")
-            print("\n".join(lines))
-            PY
+            {
+              echo "# Coverage Summary"
+              echo
+              echo "Target: $APP_NAME"
+              echo "Overall line coverage: $APP_COVERAGE"
+              echo
+              echo "## Lowest Coverage Files (Top 10)"
+              echo
+              echo '| File | Coverage |'
+              echo '| --- | ---: |'
+              grep -E '(/|\\.swift)' coverage/coverage.txt | tail -n 10 | awk '{
+                file=$0
+                cov=$NF
+                sub(/[[:space:]]*[^[:space:]]+$/, "", file)
+                gsub(/^[[:space:]]+|[[:space:]]+$/, "", file)
+                printf("| %s | %s |\n", file, cov)
+              }'
+            } > coverage/summary.md
 
             cat coverage/summary.md >> "$GITHUB_STEP_SUMMARY"
           else
