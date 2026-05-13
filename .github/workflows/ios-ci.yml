@@ -67,8 +67,48 @@ jobs:
             exit 1
           fi
 
+          wait_for_boot() {
+            local udid="$1"
+            local timeout_sec=180
+            local start_ts
+            start_ts=$(date +%s)
+
+            while true; do
+              state=$(xcrun simctl list devices --json | python3 -c 'import json,sys;d=json.load(sys.stdin).get("devices",{});u=sys.argv[1];
+for arr in d.values():
+  for dev in arr:
+    if dev.get("udid")==u:
+      print(dev.get("state","Unknown"));sys.exit(0)
+print("Unknown")' "$udid")
+
+              if [ "$state" = "Booted" ]; then
+                return 0
+              fi
+
+              now_ts=$(date +%s)
+              if [ $((now_ts - start_ts)) -ge "$timeout_sec" ]; then
+                echo "Simulator failed to boot within ${timeout_sec}s. Last state: $state"
+                return 1
+              fi
+
+              sleep 5
+            done
+          }
+
+          xcrun simctl shutdown all || true
           xcrun simctl boot "$SIM_ID" || true
-          xcrun simctl bootstatus "$SIM_ID" -b
+
+          if ! wait_for_boot "$SIM_ID"; then
+            echo "Retrying simulator boot after reset..."
+            xcrun simctl shutdown "$SIM_ID" || true
+            xcrun simctl erase "$SIM_ID" || true
+            xcrun simctl boot "$SIM_ID" || true
+            wait_for_boot "$SIM_ID" || {
+              echo "Simulator boot retry failed."
+              xcrun simctl list devices available
+              exit 1
+            }
+          fi
 
           echo "Using simulator ID: $SIM_ID"
           echo "IOS_DESTINATION=platform=iOS Simulator,id=$SIM_ID" >> "$GITHUB_ENV"
