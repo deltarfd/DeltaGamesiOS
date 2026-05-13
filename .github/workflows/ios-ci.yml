@@ -122,6 +122,7 @@ jobs:
             -configuration Debug \
             -derivedDataPath DerivedData \
             -resultBundlePath TestResults.xcresult \
+            -enableCodeCoverage YES \
             -parallel-testing-enabled NO \
             -only-testing:DeltaGamesTests \
             test-without-building
@@ -183,24 +184,37 @@ jobs:
         run: |
           mkdir -p coverage
 
-          # Prefer profdata from inside the xcresult bundle — that contains
-          # the merged runtime coverage from the actual test run.
-          # DerivedData/Build/ProfileData contains only the build-time
-          # template which is empty of real coverage data.
-          PROFDATA=$(find TestResults.xcresult -name '*.profdata' 2>/dev/null | head -n 1 || true)
-          if [ -z "$PROFDATA" ]; then
-            echo "No .profdata found inside TestResults.xcresult. Coverage generation skipped."
+          if [ ! -d "TestResults.xcresult" ]; then
+            echo "TestResults.xcresult not found. Coverage generation skipped."
             exit 0
           fi
 
-          MAIN_BIN=$(find DerivedData/Build/Products -type f -path '*Debug-iphonesimulator/DeltaGames.app/DeltaGames' 2>/dev/null | head -n 1 || true)
+          # Debug: show xcresult top-level structure so failures are diagnosable.
+          echo "=== TestResults.xcresult structure (top 2 levels) ==="
+          find TestResults.xcresult -maxdepth 2 2>/dev/null | head -40 || true
+          echo "======================================================"
+
+          # Xcode 13+ embeds coverage inside a UUID-named .xccovarchive directory
+          # inside the xcresult bundle. find(1) traverses it normally.
+          PROFDATA=$(find TestResults.xcresult -type f -name "*.profdata" 2>/dev/null | head -n 1 || true)
+
+          if [ -z "$PROFDATA" ]; then
+            echo "No .profdata found inside TestResults.xcresult."
+            echo "This usually means -enableCodeCoverage YES was not effective or"
+            echo "code coverage is not enabled in the scheme Test action."
+            exit 0
+          fi
+
+          MAIN_BIN=$(find DerivedData/Build/Products -type f \
+            -path '*Debug-iphonesimulator/DeltaGames.app/DeltaGames' 2>/dev/null | head -n 1 || true)
           if [ -z "$MAIN_BIN" ]; then
             echo "Main app binary not found. Coverage generation skipped."
             exit 0
           fi
 
           ARCHS=$(xcrun lipo -archs "$MAIN_BIN" 2>/dev/null || true)
-          # Use the arch that matches the simulator runner (arm64 on Apple Silicon, x86_64 on Intel).
+          # Pick the arch matching the runner (arm64 on Apple Silicon, x86_64 on Intel)
+          # to avoid 'no coverage data found' on fat binaries.
           HOST_ARCH=$(uname -m)
           if echo "$ARCHS" | grep -qw "$HOST_ARCH"; then
             COV_ARCH="$HOST_ARCH"
@@ -208,35 +222,30 @@ jobs:
             COV_ARCH=$(echo "$ARCHS" | awk '{print $1}')
           fi
 
-          echo "Using profdata: $PROFDATA"
+          echo "Using profdata : $PROFDATA"
           echo "Using app binary: $MAIN_BIN"
-          echo "Detected binary archs: ${ARCHS:-unknown}"
+          echo "Binary archs    : ${ARCHS:-unknown}, using: $COV_ARCH"
 
-          LLVM_COV_CMD=(xcrun llvm-cov export -format=lcov -instr-profile "$PROFDATA")
-          if [ -n "$COV_ARCH" ]; then
-            LLVM_COV_CMD+=( -arch "$COV_ARCH" )
-          fi
-          LLVM_COV_CMD+=( "$MAIN_BIN" )
-
-          if ! "${LLVM_COV_CMD[@]}" > coverage/lcov.raw.info; then
-            echo "llvm-cov export failed. Coverage generation skipped."
+          if ! xcrun llvm-cov export \
+              -format=lcov \
+              -instr-profile "$PROFDATA" \
+              -arch "$COV_ARCH" \
+              --ignore-filename-regex='.*/Pods/.*|.*/DerivedData/.*|.*Tests\.swift' \
+              "$MAIN_BIN" > coverage/lcov.raw.info 2>&1; then
+            echo "llvm-cov export failed. Output:"
+            cat coverage/lcov.raw.info || true
             exit 0
           fi
 
-          # Normalize source file paths for Codecov mapping.
+          # Normalize source file paths for Codecov repo-relative mapping.
           if [ -n "${GITHUB_WORKSPACE:-}" ]; then
             sed "s#^SF:${GITHUB_WORKSPACE}/#SF:#" coverage/lcov.raw.info > coverage/lcov.info
           else
             cp coverage/lcov.raw.info coverage/lcov.info
           fi
 
-          if [ ! -s coverage/lcov.info ]; then
-            echo "Generated LCOV is empty."
-            exit 0
-          fi
-
-          if ! grep -q '^SF:' coverage/lcov.info; then
-            echo "Generated LCOV has no source file records."
+          if [ ! -s coverage/lcov.info ] || ! grep -q '^SF:' coverage/lcov.info; then
+            echo "Generated LCOV is empty or has no source file records."
             exit 0
           fi
 
