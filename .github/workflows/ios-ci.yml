@@ -140,49 +140,42 @@ jobs:
             cat coverage/summary.md >> "$GITHUB_STEP_SUMMARY"
           fi
 
-      - name: Generate LCOV for Codecov
+      - name: Generate Coverage JSON for Codecov
         if: always()
         run: |
           mkdir -p coverage
 
-          PROFDATA=$(find DerivedData -type f \( -name 'Coverage.profdata' -o -name '*.profdata' \) | head -n 1 || true)
-          APP_BINARY=$(find DerivedData/Build/Products -type f -path '*Debug-iphonesimulator/DeltaGames.app/DeltaGames' | head -n 1 || true)
-
-          if [ -z "$PROFDATA" ]; then
-            echo "No .profdata coverage file found under DerivedData."
-            find DerivedData -type f -name '*.profdata' | sed -n '1,120p' || true
+          if [ ! -d "TestResults.xcresult" ]; then
+            echo "TestResults.xcresult not found. Coverage generation skipped."
             exit 0
           fi
 
-          if [ -z "$APP_BINARY" ]; then
-            echo "No app binary found for coverage export."
-            find DerivedData/Build/Products -type f | sed -n '1,120p' || true
+          # Extract JSON coverage from xcresult bundle
+          if ! xcrun xccov view --report --json TestResults.xcresult > coverage/coverage.raw.json 2>&1; then
+            echo "Failed to extract JSON from xcresult. Coverage generation skipped."
             exit 0
           fi
 
-          xcrun llvm-cov export \
-            -format=lcov \
-            -instr-profile "$PROFDATA" \
-            -ignore-filename-regex='(^|.*/)(Pods|DerivedData|Build|Tests?)(/|$)' \
-            "$APP_BINARY" > coverage/lcov.info
-
-          if [ ! -s coverage/lcov.info ]; then
-            echo "Generated LCOV file is empty."
+          # Validate JSON has content
+          if ! grep -q '"files"' coverage/coverage.raw.json; then
+            echo "Coverage JSON is empty or malformed. Coverage generation skipped."
             exit 0
           fi
 
-          if ! grep -q '^SF:' coverage/lcov.info; then
-            echo "LCOV file does not contain source entries (SF)."
+          mv coverage/coverage.raw.json coverage/coverage.json
+
+          if [ ! -s coverage/coverage.json ]; then
+            echo "Generated coverage JSON is empty."
             exit 0
           fi
 
-          echo "Generated coverage/lcov.info for Codecov upload."
+          echo "Generated coverage/coverage.json for Codecov upload."
 
       - name: Upload Coverage to Codecov
-        if: always() && hashFiles('coverage/lcov.info') != ''
+        if: always() && hashFiles('coverage/coverage.json') != ''
         uses: codecov/codecov-action@v5
         with:
-          files: coverage/lcov.info
+          files: coverage/coverage.json
           disable_search: true
           flags: ios
           fail_ci_if_error: false
