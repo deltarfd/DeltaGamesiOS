@@ -189,19 +189,15 @@ jobs:
             exit 0
           fi
 
-          # Debug: show xcresult top-level structure so failures are diagnosable.
-          echo "=== TestResults.xcresult structure (top 2 levels) ==="
-          find TestResults.xcresult -maxdepth 2 2>/dev/null | head -40 || true
-          echo "======================================================"
-
-          # Xcode 13+ embeds coverage inside a UUID-named .xccovarchive directory
-          # inside the xcresult bundle. find(1) traverses it normally.
+          # Try xcresult first, then fall back to DerivedData.
           PROFDATA=$(find TestResults.xcresult -type f -name "*.profdata" 2>/dev/null | head -n 1 || true)
+          if [ -z "$PROFDATA" ]; then
+            PROFDATA=$(find DerivedData -type f -name "*.profdata" 2>/dev/null | head -n 1 || true)
+          fi
 
           if [ -z "$PROFDATA" ]; then
-            echo "No .profdata found inside TestResults.xcresult."
-            echo "This usually means -enableCodeCoverage YES was not effective or"
-            echo "code coverage is not enabled in the scheme Test action."
+            echo "No .profdata found in TestResults.xcresult or DerivedData."
+            echo "Skipping LCOV generation and relying on xccov JSON fallback upload."
             exit 0
           fi
 
@@ -211,6 +207,9 @@ jobs:
             echo "Main app binary not found. Coverage generation skipped."
             exit 0
           fi
+
+          TEST_BIN=$(find DerivedData/Build/Products -type f \
+            -path '*Debug-iphonesimulator/DeltaGamesTests.xctest/DeltaGamesTests' 2>/dev/null | head -n 1 || true)
 
           ARCHS=$(xcrun lipo -archs "$MAIN_BIN" 2>/dev/null || true)
           # Pick the arch matching the runner (arm64 on Apple Silicon, x86_64 on Intel)
@@ -226,12 +225,18 @@ jobs:
           echo "Using app binary: $MAIN_BIN"
           echo "Binary archs    : ${ARCHS:-unknown}, using: $COV_ARCH"
 
-          if ! xcrun llvm-cov export \
-              -format=lcov \
-              -instr-profile "$PROFDATA" \
-              -arch "$COV_ARCH" \
-              --ignore-filename-regex='.*/Pods/.*|.*/DerivedData/.*|.*Tests\.swift' \
-              "$MAIN_BIN" > coverage/lcov.raw.info 2>&1; then
+          LLVM_COV_CMD=(xcrun llvm-cov export \
+            -format=lcov \
+            -instr-profile "$PROFDATA" \
+            -arch "$COV_ARCH" \
+            --ignore-filename-regex='.*/Pods/.*|.*/DerivedData/.*|.*Tests\.swift' \
+            "$MAIN_BIN")
+
+          if [ -n "$TEST_BIN" ]; then
+            LLVM_COV_CMD+=("$TEST_BIN")
+          fi
+
+          if ! "${LLVM_COV_CMD[@]}" > coverage/lcov.raw.info 2>&1; then
             echo "llvm-cov export failed. Output:"
             cat coverage/lcov.raw.info || true
             exit 0
@@ -257,6 +262,17 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           files: coverage/lcov.info
+          disable_search: true
+          flags: ios
+          fail_ci_if_error: false
+          verbose: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload Coverage JSON Fallback to Codecov
+        if: always() && hashFiles('coverage/lcov.info') == '' && hashFiles('coverage/coverage.json') != ''
+        uses: codecov/codecov-action@v5
+        with:
+          files: coverage/coverage.json
           disable_search: true
           flags: ios
           fail_ci_if_error: false
