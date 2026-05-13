@@ -183,13 +183,13 @@ jobs:
         run: |
           mkdir -p coverage
 
-          PROFDATA=$(find DerivedData -type f -name 'Coverage.profdata' 2>/dev/null | head -n 1 || true)
+          # Prefer profdata from inside the xcresult bundle — that contains
+          # the merged runtime coverage from the actual test run.
+          # DerivedData/Build/ProfileData contains only the build-time
+          # template which is empty of real coverage data.
+          PROFDATA=$(find TestResults.xcresult -name '*.profdata' 2>/dev/null | head -n 1 || true)
           if [ -z "$PROFDATA" ]; then
-            PROFDATA=$(find DerivedData -type f -name '*.profdata' 2>/dev/null | head -n 1 || true)
-          fi
-
-          if [ -z "$PROFDATA" ]; then
-            echo "No .profdata file found. Coverage generation skipped."
+            echo "No .profdata found inside TestResults.xcresult. Coverage generation skipped."
             exit 0
           fi
 
@@ -200,7 +200,13 @@ jobs:
           fi
 
           ARCHS=$(xcrun lipo -archs "$MAIN_BIN" 2>/dev/null || true)
-          COV_ARCH=$(echo "$ARCHS" | awk '{print $1}')
+          # Use the arch that matches the simulator runner (arm64 on Apple Silicon, x86_64 on Intel).
+          HOST_ARCH=$(uname -m)
+          if echo "$ARCHS" | grep -qw "$HOST_ARCH"; then
+            COV_ARCH="$HOST_ARCH"
+          else
+            COV_ARCH=$(echo "$ARCHS" | awk '{print $1}')
+          fi
 
           echo "Using profdata: $PROFDATA"
           echo "Using app binary: $MAIN_BIN"
