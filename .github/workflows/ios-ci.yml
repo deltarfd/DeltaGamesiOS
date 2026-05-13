@@ -183,32 +183,36 @@ jobs:
         run: |
           mkdir -p coverage
 
-          PROFDATA=$(find DerivedData Build -type f \( -name 'Coverage.profdata' -o -name '*.profdata' \) 2>/dev/null | head -n 1 || true)
+          PROFDATA=$(find DerivedData -type f -name 'Coverage.profdata' 2>/dev/null | head -n 1 || true)
+          if [ -z "$PROFDATA" ]; then
+            PROFDATA=$(find DerivedData -type f -name '*.profdata' 2>/dev/null | head -n 1 || true)
+          fi
+
           if [ -z "$PROFDATA" ]; then
             echo "No .profdata file found. Coverage generation skipped."
             exit 0
           fi
 
-          MAIN_BIN=$(find DerivedData/Build/Products Build/Build/Products -type f -path '*Debug-iphonesimulator/DeltaGames.app/DeltaGames' 2>/dev/null | head -n 1 || true)
+          MAIN_BIN=$(find DerivedData/Build/Products -type f -path '*Debug-iphonesimulator/DeltaGames.app/DeltaGames' 2>/dev/null | head -n 1 || true)
           if [ -z "$MAIN_BIN" ]; then
             echo "Main app binary not found. Coverage generation skipped."
             exit 0
           fi
 
-          EXTRA_OBJECTS=$(find DerivedData/Build/Products Build/Build/Products -type f \( -path '*Debug-iphonesimulator/*.framework/*' -o -path '*Debug-iphonesimulator/*.xctest/*' \) 2>/dev/null || true)
-          OBJ_ARGS=()
-          while IFS= read -r obj; do
-            [ -z "$obj" ] && continue
-            if file "$obj" | grep -q 'Mach-O'; then
-              OBJ_ARGS+=("-object" "$obj")
-            fi
-          done <<< "$EXTRA_OBJECTS"
+          ARCHS=$(xcrun lipo -archs "$MAIN_BIN" 2>/dev/null || true)
+          COV_ARCH=$(echo "$ARCHS" | awk '{print $1}')
 
-          if ! xcrun llvm-cov export \
-            -format=lcov \
-            -instr-profile "$PROFDATA" \
-            "$MAIN_BIN" \
-            "${OBJ_ARGS[@]}" > coverage/lcov.raw.info; then
+          echo "Using profdata: $PROFDATA"
+          echo "Using app binary: $MAIN_BIN"
+          echo "Detected binary archs: ${ARCHS:-unknown}"
+
+          LLVM_COV_CMD=(xcrun llvm-cov export -format=lcov -instr-profile "$PROFDATA")
+          if [ -n "$COV_ARCH" ]; then
+            LLVM_COV_CMD+=( -arch "$COV_ARCH" )
+          fi
+          LLVM_COV_CMD+=( "$MAIN_BIN" )
+
+          if ! "${LLVM_COV_CMD[@]}" > coverage/lcov.raw.info; then
             echo "llvm-cov export failed. Coverage generation skipped."
             exit 0
           fi
