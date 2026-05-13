@@ -140,11 +140,29 @@ jobs:
             cat coverage/summary.md >> "$GITHUB_STEP_SUMMARY"
           fi
 
-      - name: Upload Coverage to Codecov
+      - name: Prepare Codecov Coverage Files
         if: always() && hashFiles('TestResults.xcresult/**') != ''
+        run: |
+          mkdir -p coverage/codecov
+
+          XCCOV_REPORT=$(find TestResults.xcresult -type f -name '*.xccovreport' | head -n 1 || true)
+          XCCOV_ARCHIVE=$(find TestResults.xcresult -type f -name '*.xccovarchive' | head -n 1 || true)
+
+          if [ -n "$XCCOV_REPORT" ] && [ -n "$XCCOV_ARCHIVE" ]; then
+            cp "$XCCOV_REPORT" coverage/codecov/action.xccovreport
+            cp "$XCCOV_ARCHIVE" coverage/codecov/action.xccovarchive
+            echo "Prepared xccov files for Codecov upload."
+          else
+            echo "Could not locate .xccovreport/.xccovarchive inside TestResults.xcresult"
+            find TestResults.xcresult -maxdepth 5 -type f | sed -n '1,120p'
+          fi
+
+      - name: Upload Coverage to Codecov
+        if: always() && hashFiles('coverage/codecov/*.xccov*') != ''
         uses: codecov/codecov-action@v5
         with:
-          files: TestResults.xcresult
+          files: coverage/codecov/action.xccovreport,coverage/codecov/action.xccovarchive
+          disable_search: true
           flags: ios
           fail_ci_if_error: false
           verbose: true

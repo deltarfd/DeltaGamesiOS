@@ -1,0 +1,16 @@
+codecov:
+  require_ci_to_pass: false
+
+coverage:
+  status:
+    project:
+      default:
+        informational: true
+
+fixes:
+  - "/Users/runner/work/DeltaGamesiOS/DeltaGamesiOS/::"
+
+ignore:
+  - "Pods/**"
+  - "Build/**"
+  - "DerivedData/**"
