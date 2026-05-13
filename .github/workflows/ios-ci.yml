@@ -55,7 +55,8 @@ jobs:
             -destination 'generic/platform=iOS Simulator' \
             -configuration Debug \
             -derivedDataPath DerivedData \
-            clean build
+            -enableCodeCoverage YES \
+            clean build-for-testing
 
       - name: Start iOS Simulator
         run: |
@@ -109,6 +110,7 @@ jobs:
           echo "IOS_DESTINATION=platform=iOS Simulator,id=$SIM_ID" >> "$GITHUB_ENV"
 
       - name: Run App Tests (includes SPM dependencies)
+        timeout-minutes: 20
         env:
           RAWG_API_KEY: ${{ secrets.RAWG_API_KEY }}
         run: |
@@ -116,12 +118,13 @@ jobs:
             -workspace DeltaGames.xcworkspace \
             -scheme DeltaGames \
             -destination "$IOS_DESTINATION" \
+            -destination-timeout 120 \
             -configuration Debug \
             -derivedDataPath DerivedData \
-            -enableCodeCoverage YES \
             -resultBundlePath TestResults.xcresult \
+            -parallel-testing-enabled NO \
             -only-testing:DeltaGamesTests \
-            test
+            test-without-building
 
       - name: Generate Coverage Report
         if: always()
