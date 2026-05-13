@@ -20,7 +20,7 @@ DeltaGames is a SwiftUI iOS app for discovering game data from RAWG API with fav
 
 The RAWG API key is managed securely through environment variables:
 
-- **For CI/CD (main repo)**: Set `RAWG_API_KEY` secret in GitHub Actions or `CODEMAGIC_BUILD_RAWG_API_KEY` in Codemagic for full coverage data.
+- **For CI/CD (main repo)**: Set `RAWG_API_KEY` secret in GitHub Actions or `RAWG_API_KEY` in Codemagic for full coverage data.
 - **For Fork PRs**: CI automatically uses a non-secret fallback key; build/tests run without external API data.
 - **For Local Development**: Set `RAWG_API_KEY` env variable or update `RawgAPI.plist`
 
