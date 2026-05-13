@@ -74,12 +74,7 @@ jobs:
             start_ts=$(date +%s)
 
             while true; do
-              state=$(xcrun simctl list devices --json | python3 -c 'import json,sys;d=json.load(sys.stdin).get("devices",{});u=sys.argv[1];
-for arr in d.values():
-  for dev in arr:
-    if dev.get("udid")==u:
-      print(dev.get("state","Unknown"));sys.exit(0)
-print("Unknown")' "$udid")
+              state=$(xcrun simctl list devices --json | python3 -c 'import json,sys;d=json.load(sys.stdin).get("devices",{});u=sys.argv[1];print(next((dev.get("state","Unknown") for arr in d.values() for dev in arr if dev.get("udid")==u),"Unknown"))' "$udid")
 
               if [ "$state" = "Booted" ]; then
                 return 0
