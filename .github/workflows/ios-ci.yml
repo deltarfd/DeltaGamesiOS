@@ -140,28 +140,49 @@ jobs:
             cat coverage/summary.md >> "$GITHUB_STEP_SUMMARY"
           fi
 
-      - name: Prepare Codecov Coverage Files
-        if: always() && hashFiles('TestResults.xcresult/**') != ''
+      - name: Generate LCOV for Codecov
+        if: always()
         run: |
-          mkdir -p coverage/codecov
+          mkdir -p coverage
 
-          XCCOV_REPORT=$(find TestResults.xcresult -type f -name '*.xccovreport' | head -n 1 || true)
-          XCCOV_ARCHIVE=$(find TestResults.xcresult -type f -name '*.xccovarchive' | head -n 1 || true)
+          PROFDATA=$(find DerivedData -type f \( -name 'Coverage.profdata' -o -name '*.profdata' \) | head -n 1 || true)
+          APP_BINARY=$(find DerivedData/Build/Products -type f -path '*Debug-iphonesimulator/DeltaGames.app/DeltaGames' | head -n 1 || true)
 
-          if [ -n "$XCCOV_REPORT" ] && [ -n "$XCCOV_ARCHIVE" ]; then
-            cp "$XCCOV_REPORT" coverage/codecov/action.xccovreport
-            cp "$XCCOV_ARCHIVE" coverage/codecov/action.xccovarchive
-            echo "Prepared xccov files for Codecov upload."
-          else
-            echo "Could not locate .xccovreport/.xccovarchive inside TestResults.xcresult"
-            find TestResults.xcresult -maxdepth 5 -type f | sed -n '1,120p'
+          if [ -z "$PROFDATA" ]; then
+            echo "No .profdata coverage file found under DerivedData."
+            find DerivedData -type f -name '*.profdata' | sed -n '1,120p' || true
+            exit 0
           fi
 
+          if [ -z "$APP_BINARY" ]; then
+            echo "No app binary found for coverage export."
+            find DerivedData/Build/Products -type f | sed -n '1,120p' || true
+            exit 0
+          fi
+
+          xcrun llvm-cov export \
+            -format=lcov \
+            -instr-profile "$PROFDATA" \
+            -ignore-filename-regex='(^|.*/)(Pods|DerivedData|Build|Tests?)(/|$)' \
+            "$APP_BINARY" > coverage/lcov.info
+
+          if [ ! -s coverage/lcov.info ]; then
+            echo "Generated LCOV file is empty."
+            exit 0
+          fi
+
+          if ! grep -q '^SF:' coverage/lcov.info; then
+            echo "LCOV file does not contain source entries (SF)."
+            exit 0
+          fi
+
+          echo "Generated coverage/lcov.info for Codecov upload."
+
       - name: Upload Coverage to Codecov
-        if: always() && hashFiles('coverage/codecov/*.xccov*') != ''
+        if: always() && hashFiles('coverage/lcov.info') != ''
         uses: codecov/codecov-action@v5
         with:
-          files: coverage/codecov/action.xccovreport,coverage/codecov/action.xccovarchive
+          files: coverage/lcov.info
           disable_search: true
           flags: ios
           fail_ci_if_error: false
