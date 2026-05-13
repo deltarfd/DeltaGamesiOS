@@ -19,13 +19,15 @@ jobs:
           RAWG_API_KEY: ${{ secrets.RAWG_API_KEY }}
         run: |
           if [ -z "${RAWG_API_KEY:-}" ]; then
-            echo "RAWG_API_KEY is missing from GitHub secrets/vars."
-            echo "If this is a pull_request from a fork, secrets are not exposed."
-            exit 1
+            echo "RAWG_API_KEY is missing (common on pull_request from forks)."
+            echo "Using a non-secret CI fallback key so build/tests can still run."
+            CI_API_KEY="ci_fallback_key_no_secrets"
+          else
+            CI_API_KEY="$RAWG_API_KEY"
           fi
 
-          /usr/libexec/PlistBuddy -c "Set :API_KEY $RAWG_API_KEY" DeltaGames/Resources/RawgAPI.plist \
-            || /usr/libexec/PlistBuddy -c "Add :API_KEY string $RAWG_API_KEY" DeltaGames/Resources/RawgAPI.plist
+          /usr/libexec/PlistBuddy -c "Set :API_KEY $CI_API_KEY" DeltaGames/Resources/RawgAPI.plist \
+            || /usr/libexec/PlistBuddy -c "Add :API_KEY string $CI_API_KEY" DeltaGames/Resources/RawgAPI.plist
 
       - name: Select Latest Stable Xcode
         uses: maxim-lobanov/setup-xcode@v1
@@ -139,10 +141,10 @@ jobs:
           fi
 
       - name: Upload Coverage to Codecov
-        if: always() && hashFiles('coverage/coverage.json') != ''
+        if: always() && hashFiles('TestResults.xcresult/**') != ''
         uses: codecov/codecov-action@v5
         with:
-          files: coverage/coverage.json
+          files: TestResults.xcresult
           flags: ios
           fail_ci_if_error: false
           verbose: true
