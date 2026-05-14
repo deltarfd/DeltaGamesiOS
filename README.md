@@ -1,6 +1,25 @@
 # DeltaGames iOS
 
+[![iOS CI](https://github.com/deltarfd/DeltaGamesiOS/actions/workflows/ios-ci.yml/badge.svg)](https://github.com/deltarfd/DeltaGamesiOS/actions/workflows/ios-ci.yml)
+[![Security and Dependencies](https://github.com/deltarfd/DeltaGamesiOS/actions/workflows/security-and-deps.yml/badge.svg)](https://github.com/deltarfd/DeltaGamesiOS/actions/workflows/security-and-deps.yml)
+
 DeltaGames is a SwiftUI iOS app for discovering game data from RAWG API with favorite management and profile features.
+
+## Prototype
+
+<a href="https://www.figma.com/proto/NnC0lsVvTqmuX5Ikvbmuor/Delta-Games---DICODING-2026-Updated?node-id=0-1&t=HlXVOVsqxpOlRHch-1" target="_blank" rel="noopener noreferrer">
+  <img src="https://img.shields.io/badge/Figma-View%20Interactive%20Prototype-F24E1E?logo=figma&logoColor=white" alt="Open Figma Prototype" />
+</a>
+
+<a href="https://www.figma.com/proto/NnC0lsVvTqmuX5Ikvbmuor/Delta-Games---DICODING-2026-Updated?node-id=0-1&t=HlXVOVsqxpOlRHch-1">View Interactive Prototype</a>
+
+## Screenshots
+
+<img src="docs/HomeScreen.png" alt="Home Screen" width="220" />
+<img src="docs/SearchScreen.png" alt="Search Screen" width="220" />
+<img src="docs/GameDetailScreen.png" alt="Game Detail Screen" width="220" />
+<img src="docs/FavoriteScreen.png" alt="Favorite Screen" width="220" />
+<img src="docs/ProfileScreen.png" alt="Profile Screen" width="220" />
 
 ## Submission Readiness Highlights
 
