@@ -12,6 +12,8 @@ import Combine
 final class SearchPresenter: ObservableObject {
   private var cancellables: Set<AnyCancellable> = []
   private let searchUseCase: SearchUseCase
+  private var initialGamesCache: [GameModel] = []
+  private var didLoadInitialGames = false
 
   @Published var searchGames: [GameModel] = []
   @Published var errorMessage: String = ""
@@ -24,10 +26,21 @@ final class SearchPresenter: ObservableObject {
   func resetSearch() {
     errorMessage = ""
     loadingState = false
-    searchGames = []
+    if didLoadInitialGames {
+      searchGames = initialGamesCache
+    } else {
+      searchGames = []
+    }
   }
   
   func loadInitialGames() {
+    if didLoadInitialGames {
+      errorMessage = ""
+      loadingState = false
+      searchGames = initialGamesCache
+      return
+    }
+
     errorMessage = ""
     loadingState = true
     cancellables.removeAll()
@@ -43,6 +56,8 @@ final class SearchPresenter: ObservableObject {
         },
         receiveValue: { [weak self] games in
           self?.searchGames = games
+          self?.initialGamesCache = games
+          self?.didLoadInitialGames = true
         }
       )
         .store(in: &cancellables)
@@ -51,9 +66,23 @@ final class SearchPresenter: ObservableObject {
   func getSearchGames(search: String) {
     let query = search.trimmingCharacters(in: .whitespacesAndNewlines)
     guard !query.isEmpty else {
-      loadInitialGames()
+      if didLoadInitialGames {
+        errorMessage = ""
+        loadingState = false
+        searchGames = initialGamesCache
+      } else {
+        loadInitialGames()
+      }
       return
     }
+
+    guard query.count >= 2 else {
+      errorMessage = ""
+      loadingState = false
+      searchGames = didLoadInitialGames ? initialGamesCache : []
+      return
+    }
+
     errorMessage = ""
     loadingState = true
     cancellables.removeAll()

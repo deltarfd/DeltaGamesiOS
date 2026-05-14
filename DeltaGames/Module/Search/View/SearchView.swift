@@ -34,7 +34,9 @@ struct SearchView: View {
                   }
                 } else if !presenter.errorMessage.isEmpty {
                   Text(presenter.errorMessage)
-                } else if presenter.searchGames.isEmpty && !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                } else if presenter.searchGames.isEmpty
+                          && !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                          && searchText.trimmingCharacters(in: .whitespacesAndNewlines).count >= 2 {
                   HStack {
                       Spacer()
                     Text(L10n.text("search.not_found"))
@@ -49,6 +51,7 @@ struct SearchView: View {
         }
         .onDisappear {
             searchWorkItem?.cancel()
+          isEditing = false
         }
         .onAppear {
             guard !hasInitialized else { return }
@@ -67,9 +70,22 @@ struct SearchView: View {
 extension SearchView {
     var searchBarView: some View {
         HStack {
-          TextField(L10n.text("search.placeholder"), text: $searchText)
+          TextField(
+            L10n.text("search.placeholder"),
+            text: $searchText,
+            onEditingChanged: { editing in
+              isEditing = editing
+            }
+          )
                 .onChange(of: searchText, perform: { _ in
                   searchWorkItem?.cancel()
+
+                  let trimmed = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+                  if trimmed.count == 1 {
+                    presenter.resetSearch()
+                    return
+                  }
+
                   let workItem = DispatchWorkItem {
                     presenter.getSearchGames(search: searchText)
                   }
@@ -86,9 +102,10 @@ extension SearchView {
                             .foregroundColor(.gray)
                             .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
                             .padding(.leading, 8)
-                        if isEditing {
+                        if isEditing || !searchText.isEmpty {
                             Button {
                               searchText = ""
+                            presenter.getSearchGames(search: "")
                             } label: {
                                 Image(systemName: "multiply.circle.fill")
                                     .foregroundColor(.gray)
@@ -98,22 +115,19 @@ extension SearchView {
                     }
                 )
                 .padding(.horizontal, 10)
-                .onTapGesture {
-                    self.isEditing = true
-                }
             
-            if isEditing {
+              if isEditing || !searchText.isEmpty {
                 Button {
-                    self.isEditing = false
+                  isEditing = false
+                  searchWorkItem?.cancel()
                     searchText = ""
+                  presenter.getSearchGames(search: "")
                     // Dismiss the keyboard
                     UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                 } label: {
                   Text(L10n.text("common.cancel"))
                 }
                 .padding(.trailing, 10)
-                .transition(.move(edge: .trailing))
-                .animation(.default, value: isEditing)
             }
         }
     }
@@ -124,11 +138,11 @@ extension SearchView {
           ForEach(self.presenter.searchGames) { game in
             self.presenter.linkBuilder(for: game, destination: { linkedGame in
                 AnyView(LazyView(SearchRouter().makeDetailView(for: linkedGame)))
-            }) {
+          }, content: {
                     GameCardView(game: game)
                         .padding()
                         .frame(height: UIScreen.main.bounds.height/3)
-                }.buttonStyle(PlainButtonStyle())
+              }).buttonStyle(PlainButtonStyle())
             }
         }
     }

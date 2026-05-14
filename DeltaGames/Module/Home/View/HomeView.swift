@@ -102,11 +102,11 @@ extension HomeView {
           ForEach(self.presenter.trending, id: \.id) { trending in
             self.presenter.linkBuilder(for: trending, destination: { game in
               AnyView(LazyView(HomeRouter().makeDetailView(for: game)))
-            }) {
+            }, detailView: {
               GameCardView(game: trending)
                   .padding()
                   .frame(width: UIScreen.main.bounds.width)
-            }.buttonStyle(PlainButtonStyle())
+            }).buttonStyle(PlainButtonStyle())
           }
         }
     }.frame(height: UIScreen.main.bounds.height/3)
@@ -117,11 +117,11 @@ extension HomeView {
       ForEach(self.presenter.games) { game in
         self.presenter.linkBuilder(for: game, destination: { linkedGame in
           AnyView(LazyView(HomeRouter().makeDetailView(for: linkedGame)))
-        }) {
+        }, detailView: {
           GameCardView(game: game)
               .padding()
               .frame(height: UIScreen.main.bounds.height/3)
-        }.buttonStyle(PlainButtonStyle())
+        }).buttonStyle(PlainButtonStyle())
         }
     }
   }

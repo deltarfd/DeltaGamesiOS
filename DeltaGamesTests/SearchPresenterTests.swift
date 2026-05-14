@@ -46,10 +46,23 @@ final class SearchPresenterTests: XCTestCase {
         useCase.publisher = Fail(error: NSError(domain: "Test", code: 21)).eraseToAnyPublisher()
         let presenter = SearchPresenter(searchUseCase: useCase)
 
-        presenter.getSearchGames(search: "x")
+        presenter.getSearchGames(search: "xx")
         waitForMainQueue()
 
         XCTAssertFalse(presenter.errorMessage.isEmpty)
+        XCTAssertFalse(presenter.loadingState)
+    }
+
+    @MainActor
+    func testGetSearchGamesShortQuerySkipsRequest() {
+        let useCase = SearchUseCaseMock()
+        let presenter = SearchPresenter(searchUseCase: useCase)
+
+        presenter.getSearchGames(search: "x")
+        waitForMainQueue()
+
+        XCTAssertNil(useCase.lastQuery)
+        XCTAssertEqual(presenter.errorMessage, "")
         XCTAssertFalse(presenter.loadingState)
     }
 

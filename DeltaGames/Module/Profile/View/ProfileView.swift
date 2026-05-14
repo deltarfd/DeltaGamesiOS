@@ -30,7 +30,7 @@ struct ProfileView: View {
                     ForEach(AppLanguage.allCases, id: \.self) { language in
                         Button(action: {
                             appLanguageCode = language.rawValue
-                        }) {
+                        }, label: {
                             Text(L10n.text(language.displayKey))
                                 .font(.system(size: 12, weight: .medium))
                                 .frame(maxWidth: .infinity)
@@ -39,7 +39,7 @@ struct ProfileView: View {
                                 .background(selectedLanguage == language ? Color.appPrimary : Color(.systemGray5))
                                 .foregroundColor(selectedLanguage == language ? .white : Color(.systemGray2))
                                 .cornerRadius(6)
-                        }
+                        })
                     }
                 }
             }

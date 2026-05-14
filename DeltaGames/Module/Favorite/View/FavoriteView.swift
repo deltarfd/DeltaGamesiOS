@@ -61,11 +61,11 @@ extension FavoriteView {
       ForEach(presenter.favGames) { game in
       self.presenter.linkBuilder(for: game, destination: { linkedGame, onDismiss in
         AnyView(LazyView(FavoriteRouter().makeDetailView(for: linkedGame, onDismiss: onDismiss)))
-      }) {
+      }, content: {
             GameCardView(game: game)
                 .padding()
                 .frame(height: UIScreen.main.bounds.height/3)
-        }.buttonStyle(PlainButtonStyle())
+        }).buttonStyle(PlainButtonStyle())
       }
     }
   }
