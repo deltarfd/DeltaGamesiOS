@@ -7,9 +7,11 @@ DeltaGames is a SwiftUI iOS app for discovering game data from RAWG API with fav
 
 ## Prototype
 
-[![Open in Figma](https://img.shields.io/badge/Figma-View%20Interactive%20Prototype-F24E1E?logo=figma&logoColor=white)](https://www.figma.com/proto/NnC0lsVvTqmuX5Ikvbmuor/Delta-Games---DICODING-2026-Updated?node-id=0-1&t=HlXVOVsqxpOlRHch-1)
+[![Open in Figma](https://img.shields.io/badge/Figma-Open%20Wireframe%20Design-F24E1E?logo=figma&logoColor=white)](https://www.figma.com/design/NnC0lsVvTqmuX5Ikvbmuor/Delta-Games---DICODING-2026-Updated?node-id=0-1&t=HlXVOVsqxpOlRHch-1)
 
-[View Interactive Prototype](https://www.figma.com/proto/NnC0lsVvTqmuX5Ikvbmuor/Delta-Games---DICODING-2026-Updated?node-id=0-1&t=HlXVOVsqxpOlRHch-1)
+[View Wireframe Design](https://www.figma.com/design/NnC0lsVvTqmuX5Ikvbmuor/Delta-Games---DICODING-2026-Updated?node-id=0-1&t=HlXVOVsqxpOlRHch-1)
+
+![Wireframe](docs/Wireframe.png)
 
 ## Screenshots
 
