@@ -7,33 +7,33 @@ DeltaGames is a SwiftUI iOS app for discovering game data from RAWG API with fav
 
 ## Prototype
 
-<a href="https://www.figma.com/proto/NnC0lsVvTqmuX5Ikvbmuor/Delta-Games---DICODING-2026-Updated?node-id=0-1&t=HlXVOVsqxpOlRHch-1" target="_blank" rel="noopener noreferrer">
-  <img src="https://img.shields.io/badge/Figma-View%20Interactive%20Prototype-F24E1E?logo=figma&logoColor=white" alt="Open Figma Prototype" />
-</a>
+[![Open in Figma](https://img.shields.io/badge/Figma-View%20Interactive%20Prototype-F24E1E?logo=figma&logoColor=white)](https://www.figma.com/proto/NnC0lsVvTqmuX5Ikvbmuor/Delta-Games---DICODING-2026-Updated?node-id=0-1&t=HlXVOVsqxpOlRHch-1)
 
-<a href="https://www.figma.com/proto/NnC0lsVvTqmuX5Ikvbmuor/Delta-Games---DICODING-2026-Updated?node-id=0-1&t=HlXVOVsqxpOlRHch-1">View Interactive Prototype</a>
+[View Interactive Prototype](https://www.figma.com/proto/NnC0lsVvTqmuX5Ikvbmuor/Delta-Games---DICODING-2026-Updated?node-id=0-1&t=HlXVOVsqxpOlRHch-1)
 
 ## Screenshots
 
-<img src="docs/HomeScreen.png" alt="Home Screen" width="220" />
-<img src="docs/SearchScreen.png" alt="Search Screen" width="220" />
-<img src="docs/GameDetailScreen.png" alt="Game Detail Screen" width="220" />
-<img src="docs/FavoriteScreen.png" alt="Favorite Screen" width="220" />
-<img src="docs/ProfileScreen.png" alt="Profile Screen" width="220" />
+<table>
+  <tr>
+    <td align="center" width="50%"><img src="docs/HomeScreen.png" alt="Home Screen" width="220" /><br/><sub>Home</sub></td>
+    <td align="center" width="50%"><img src="docs/SearchScreen.png" alt="Search Screen" width="220" /><br/><sub>Search</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/GameDetailScreen.png" alt="Game Detail Screen" width="220" /><br/><sub>Detail</sub></td>
+    <td align="center"><img src="docs/FavoriteScreen.png" alt="Favorite Screen" width="220" /><br/><sub>Favorite</sub></td>
+  </tr>
+  <tr>
+    <td align="center" colspan="2"><img src="docs/ProfileScreen.png" alt="Profile Screen" width="220" /><br/><sub>Profile</sub></td>
+  </tr>
+</table>
 
-## Submission Readiness Highlights
+## App Overview
 
-- Clean Architecture layering: Data, Domain, Presentation.
-- Dependency Injection through centralized composition root.
-- Reactive programming approach using Combine.
-- Feature pages available: Home, Detail, Favorite, and Profile (About).
-- Continuous Integration with GitHub Actions (graceful handling for fork PRs).
-- Coverage reporting via Codecov with LCOV format.
-- Additional mobile pipeline with Codemagic.
-- SwiftLint enabled for style and code convention checks.
-- Business logic test package with XCTest in CoreCommon module.
-- Feature module packages (Home, Detail, Favorite, Search, Profile) prepared as independent frameworks.
-- **Security**: API key managed via CI/CD environment variables (not in source code).
+- Discover games from the RAWG API with a fast, clean SwiftUI experience.
+- Browse game lists on the Home page and search titles by keyword.
+- Open a detail page to see game information and supporting visuals.
+- Save favorites for quick access later.
+- View developer/profile information in the Profile page.
 
 ## API Key Configuration
 
