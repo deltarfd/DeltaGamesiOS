@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		23C82A64270C3F5000C37928 /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 23C82A63270C3F5000C37928 /* .swiftlint.yml */; };
+		3B89751740F586563489D4A9 /* Pods_DeltaGamesTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CFBF2B9107BDCB49DAA7AA94 /* Pods_DeltaGamesTests.framework */; };
 		5D2C1DC32744017100930B05 /* TrendingEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D2C1DC22744017100930B05 /* TrendingEntity.swift */; };
 		5D2C1DC62744019000930B05 /* SearchEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D2C1DC52744019000930B05 /* SearchEntity.swift */; };
 		5D2EEC6B2767A1D60090B9AC /* TrendingModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D2EEC6A2767A1D60090B9AC /* TrendingModel.swift */; };
@@ -64,7 +65,6 @@
 		5DFA830B2742C44900116885 /* ProfileInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DFA830A2742C44900116885 /* ProfileInteractor.swift */; };
 		5DFAA527274BBCD1008B39A0 /* FavoriteModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DFAA526274BBCD1008B39A0 /* FavoriteModel.swift */; };
 		5DFAA52A274BBD04008B39A0 /* SearchModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DFAA529274BBD03008B39A0 /* SearchModel.swift */; };
-		6E6B4BC410C51FDF0787C278 /* Pods_DeltaGames.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A284F3621B1B74216C768DAE /* Pods_DeltaGames.framework */; };
 		9F4A7C2E4B1D4E5F8A9B0C1D /* RemoteImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4A7C2D4B1D4E5F8A9B0C1D /* RemoteImageView.swift */; };
 		AA000001273B376C00518E55 /* Double+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000002273B376C00518E55 /* Double+Ext.swift */; };
 		AA000005273B376C00518E55 /* String+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000006273B376C00518E55 /* String+Ext.swift */; };
@@ -75,56 +75,19 @@
 		C26902562FB32F44003F000B /* SearchFeature in Frameworks */ = {isa = PBXBuildFile; productRef = C26902552FB32F44003F000B /* SearchFeature */; };
 		C2999D912FAAF6E4003A18B2 /* LazyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2999D902FAAF6E4003A18B2 /* LazyView.swift */; };
 		D1A100012706E043000D4A8B /* AppLanguageAndLocalizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A100022706E043000D4A8B /* AppLanguageAndLocalizationTests.swift */; };
-		D1A1000D2706E043000D4A8B /* String+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000006273B376C00518E55 /* String+Ext.swift */; };
 		D1A1000E2706E043000D4A8B /* MapperAndModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A100102706E043000D4A8B /* MapperAndModelTests.swift */; };
 		D1A1000F2706E043000D4A8B /* ExtensionsAndErrorsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A100112706E043000D4A8B /* ExtensionsAndErrorsTests.swift */; };
-		D1A100122706E043000D4A8B /* Double+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000002273B376C00518E55 /* Double+Ext.swift */; };
-		D1A100132706E043000D4A8B /* CustomeError+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D892D8C273B376C00518E55 /* CustomeError+Ext.swift */; };
-		D1A100142706E043000D4A8B /* GenreMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D892D9D273B752C00518E55 /* GenreMapper.swift */; };
-		D1A100152706E043000D4A8B /* PlatformMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D892DA0273B753F00518E55 /* PlatformMapper.swift */; };
-		D1A100162706E043000D4A8B /* TagsMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D892DA3273B755600518E55 /* TagsMapper.swift */; };
-		D1A100172706E043000D4A8B /* GenreResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D420D92270871540090DEC6 /* GenreResponse.swift */; };
-		D1A100182706E043000D4A8B /* PlatformResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D420D95270871AA0090DEC6 /* PlatformResponse.swift */; };
-		D1A100192706E043000D4A8B /* TagsResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6B6E8E270C62D00006EE17 /* TagsResponse.swift */; };
-		D1A1001A2706E043000D4A8B /* GenreModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D892D7D273B346500518E55 /* GenreModel.swift */; };
-		D1A1001B2706E043000D4A8B /* PlatformModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D892D81273B348A00518E55 /* PlatformModel.swift */; };
-		D1A1001C2706E043000D4A8B /* TagsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D892D84273B355700518E55 /* TagsModel.swift */; };
-		D1A1001D2706E043000D4A8B /* GameModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D892D79273B2C4200518E55 /* GameModel.swift */; };
 		D1A1001E2706E043000D4A8B /* GamesRepositoryProtocolStub.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A100202706E043000D4A8B /* GamesRepositoryProtocolStub.swift */; };
 		D1A1001F2706E043000D4A8B /* InteractorAndDomainModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A100212706E043000D4A8B /* InteractorAndDomainModelTests.swift */; };
-		D1A100222706E043000D4A8B /* HomeInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D51045A2733991400543052 /* HomeInteractor.swift */; };
-		D1A100232706E043000D4A8B /* DetailInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D51045D2733992900543052 /* DetailInteractor.swift */; };
-		D1A100242706E043000D4A8B /* FavoriteInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D5104602733995300543052 /* FavoriteInteractor.swift */; };
-		D1A100252706E043000D4A8B /* SearchInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D5104632733996200543052 /* SearchInteractor.swift */; };
-		D1A100262706E043000D4A8B /* ProfileInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DFA830A2742C44900116885 /* ProfileInteractor.swift */; };
-		D1A100272706E043000D4A8B /* FavoriteModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DFAA526274BBCD1008B39A0 /* FavoriteModel.swift */; };
-		D1A100282706E043000D4A8B /* SearchModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DFAA529274BBD03008B39A0 /* SearchModel.swift */; };
-		D1A100292706E043000D4A8B /* TrendingModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D2EEC6A2767A1D60090B9AC /* TrendingModel.swift */; };
 		D1A1002A2706E043000D4A8B /* APICallTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A1002B2706E043000D4A8B /* APICallTests.swift */; };
 		D1A1002C2706E043000D4A8B /* DetailPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A1002D2706E043000D4A8B /* DetailPresenterTests.swift */; };
-		D1A1002E2706E043000D4A8B /* APICall.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D892D91273B388A00518E55 /* APICall.swift */; };
-		D1A1002F2706E043000D4A8B /* DetailPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D8987D52742B5E30063BFC5 /* DetailPresenter.swift */; };
 		D1A100322706E043000D4A8B /* AdvancedMapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A100332706E043000D4A8B /* AdvancedMapperTests.swift */; };
-		D1A100342706E043000D4A8B /* GameMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D36CB0427627C9E000AAB72 /* GameMapper.swift */; };
-		D1A100352706E043000D4A8B /* FavoriteMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6CD0DC27685C6D004FF0EE /* FavoriteMapper.swift */; };
-		D1A100362706E043000D4A8B /* GameResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D420D8F27086F860090DEC6 /* GameResponse.swift */; };
 		D1A100372706E043000D4A8B /* HomePresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A100382706E043000D4A8B /* HomePresenterTests.swift */; };
 		D1A100392706E043000D4A8B /* SearchPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A1003A2706E043000D4A8B /* SearchPresenterTests.swift */; };
 		D1A1003B2706E043000D4A8B /* FavoritePresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A1003C2706E043000D4A8B /* FavoritePresenterTests.swift */; };
-		D1A1003D2706E043000D4A8B /* HomePresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D8987CF2742B55D0063BFC5 /* HomePresenter.swift */; };
-		D1A1003E2706E043000D4A8B /* SearchPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DFA83002742BE2F00116885 /* SearchPresenter.swift */; };
-		D1A1003F2706E043000D4A8B /* FavoritePresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D5C2D022742BBB700CF9F1D /* FavoritePresenter.swift */; };
-		D1A100432706E043000D4A8B /* LazyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2999D902FAAF6E4003A18B2 /* LazyView.swift */; };
-		D1A100442706E043000D4A8B /* GamesMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D892D99273B6AE000518E55 /* GamesMapper.swift */; };
-		D1A100452706E043000D4A8B /* TrendingMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DE8B8B42763C566008ABD4C /* TrendingMapper.swift */; };
-		D1A100462706E043000D4A8B /* TrendingResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D2EEC702767A6440090B9AC /* TrendingResponse.swift */; };
 		D1A100472706E043000D4A8B /* ProfilePresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A100482706E043000D4A8B /* ProfilePresenterTests.swift */; };
-		D1A100492706E043000D4A8B /* ProfilePresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DFA83072742C3FE00116885 /* ProfilePresenter.swift */; };
 		D1A1004A2706E043000D4A8B /* RouterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A1004B2706E043000D4A8B /* RouterTests.swift */; };
 		D1A1004C2706E043000D4A8B /* RouterTestStubs.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A1004D2706E043000D4A8B /* RouterTestStubs.swift */; };
-		D1A1004E2706E043000D4A8B /* HomeRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D8987D22742B5B40063BFC5 /* HomeRouter.swift */; };
-		D1A1004F2706E043000D4A8B /* SearchRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DFA83032742BE6200116885 /* SearchRouter.swift */; };
-		D1A100502706E043000D4A8B /* FavoriteRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DFA82FD2742BE0000116885 /* FavoriteRouter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -200,10 +163,10 @@
 		5DFAA529274BBD03008B39A0 /* SearchModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchModel.swift; sourceTree = "<group>"; };
 		87E9DAE692E70A5B87864DA2 /* Pods-DeltaGames.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DeltaGames.debug.xcconfig"; path = "Target Support Files/Pods-DeltaGames/Pods-DeltaGames.debug.xcconfig"; sourceTree = "<group>"; };
 		9F4A7C2D4B1D4E5F8A9B0C1D /* RemoteImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteImageView.swift; sourceTree = "<group>"; };
-		A284F3621B1B74216C768DAE /* Pods_DeltaGames.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DeltaGames.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA000002273B376C00518E55 /* Double+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Double+Ext.swift"; sourceTree = "<group>"; };
 		AA000006273B376C00518E55 /* String+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Ext.swift"; sourceTree = "<group>"; };
 		C2999D902FAAF6E4003A18B2 /* LazyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LazyView.swift; sourceTree = "<group>"; };
+		CFBF2B9107BDCB49DAA7AA94 /* Pods_DeltaGamesTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DeltaGamesTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D1A100022706E043000D4A8B /* AppLanguageAndLocalizationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLanguageAndLocalizationTests.swift; sourceTree = "<group>"; };
 		D1A100032706E043000D4A8B /* DeltaGamesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DeltaGamesTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D1A100102706E043000D4A8B /* MapperAndModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapperAndModelTests.swift; sourceTree = "<group>"; };
@@ -219,6 +182,8 @@
 		D1A100482706E043000D4A8B /* ProfilePresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePresenterTests.swift; sourceTree = "<group>"; };
 		D1A1004B2706E043000D4A8B /* RouterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouterTests.swift; sourceTree = "<group>"; };
 		D1A1004D2706E043000D4A8B /* RouterTestStubs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouterTestStubs.swift; sourceTree = "<group>"; };
+		E8E8246B5D8B1102ADC53D68 /* Pods-DeltaGamesTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DeltaGamesTests.debug.xcconfig"; path = "Target Support Files/Pods-DeltaGamesTests/Pods-DeltaGamesTests.debug.xcconfig"; sourceTree = "<group>"; };
+		EB06BE3BD4D4B4BACC7701C4 /* Pods-DeltaGamesTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DeltaGamesTests.release.xcconfig"; path = "Target Support Files/Pods-DeltaGamesTests/Pods-DeltaGamesTests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -228,7 +193,6 @@
 			files = (
 				C26902522FB32F44003F000B /* HomeFeature in Frameworks */,
 				C269024E2FB32F44003F000B /* DetailFeature in Frameworks */,
-				6E6B4BC410C51FDF0787C278 /* Pods_DeltaGames.framework in Frameworks */,
 				C26902502FB32F44003F000B /* FavoriteFeature in Frameworks */,
 				C26902542FB32F44003F000B /* ProfileFeature in Frameworks */,
 				C26902562FB32F44003F000B /* SearchFeature in Frameworks */,
@@ -239,7 +203,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6E6B4BC410C51FDF0787C278 /* Pods_DeltaGames.framework in Frameworks */,
+				3B89751740F586563489D4A9 /* Pods_DeltaGamesTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -249,7 +213,7 @@
 		4CE8302B52FF71336FE9F550 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				A284F3621B1B74216C768DAE /* Pods_DeltaGames.framework */,
+				CFBF2B9107BDCB49DAA7AA94 /* Pods_DeltaGamesTests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -665,6 +629,8 @@
 			children = (
 				87E9DAE692E70A5B87864DA2 /* Pods-DeltaGames.debug.xcconfig */,
 				24448B2B20E9B6C952D1CA2B /* Pods-DeltaGames.release.xcconfig */,
+				E8E8246B5D8B1102ADC53D68 /* Pods-DeltaGamesTests.debug.xcconfig */,
+				EB06BE3BD4D4B4BACC7701C4 /* Pods-DeltaGamesTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -696,6 +662,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = D1A100082706E043000D4A8B /* Build configuration list for PBXNativeTarget "DeltaGamesTests" */;
 			buildPhases = (
+				7BD9369D0B6A5AFE96FED308 /* [CP] Check Pods Manifest.lock */,
 				D1A100062706E043000D4A8B /* Sources */,
 				D1A100072706E043000D4A8B /* Frameworks */,
 			);
@@ -823,6 +790,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n\nCONFIG_FILE_BASE_NAME=\"RawgAPI\"\n\nCONFIG_FILE_NAME=${CONFIG_FILE_BASE_NAME}.plist\nSAMPLE_CONFIG_FILE_NAME=${CONFIG_FILE_BASE_NAME}-Sample.plist\n\nCONFIG_FILE_PATH=$SRCROOT/$PRODUCT_NAME/Resources/$CONFIG_FILE_NAME\nSAMPLE_CONFIG_FILE_PATH=$SRCROOT/$PRODUCT_NAME/Resources/$SAMPLE_CONFIG_FILE_NAME\n\nif [ -f \"$CONFIG_FILE_PATH\" ]; then\n  echo \"$CONFIG_FILE_PATH exists.\"\nelse\n  echo \"$CONFIG_FILE_PATH does not exist, copying sample\"\n  cp -v \"${SAMPLE_CONFIG_FILE_PATH}\" \"${CONFIG_FILE_PATH}\"\nfi\n\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+		};
+		7BD9369D0B6A5AFE96FED308 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-DeltaGamesTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1095,7 +1084,7 @@
 		};
 		D1A100092706E043000D4A8B /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 87E9DAE692E70A5B87864DA2 /* Pods-DeltaGames.debug.xcconfig */;
+			baseConfigurationReference = E8E8246B5D8B1102ADC53D68 /* Pods-DeltaGamesTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
@@ -1113,7 +1102,7 @@
 		};
 		D1A1000A2706E043000D4A8B /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 24448B2B20E9B6C952D1CA2B /* Pods-DeltaGames.release.xcconfig */;
+			baseConfigurationReference = EB06BE3BD4D4B4BACC7701C4 /* Pods-DeltaGamesTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;

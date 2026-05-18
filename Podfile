@@ -10,6 +10,10 @@ target 'DeltaGames' do
   pod 'Alamofire'
   pod 'RealmSwift'
 
+  target 'DeltaGamesTests' do
+    inherit! :search_paths
+  end
+
 end
 
 post_install do |installer|
