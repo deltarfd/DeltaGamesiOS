@@ -1,5 +1,6 @@
 import Combine
 import SwiftUI
+@testable import DeltaGames
 
 final class Injection {
     func provideDetail(game: GameModel) -> DetailUseCase {

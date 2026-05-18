@@ -1,5 +1,6 @@
 import SwiftUI
 import XCTest
+@testable import DeltaGames
 
 @MainActor
 final class RouterTests: XCTestCase {

@@ -1,4 +1,5 @@
 import XCTest
+@testable import DeltaGames
 
 final class MapperAndModelTests: XCTestCase {
     func testGenreMapperMapsOptionalValues() {

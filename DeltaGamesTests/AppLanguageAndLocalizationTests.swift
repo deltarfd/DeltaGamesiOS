@@ -1,4 +1,5 @@
 import XCTest
+@testable import DeltaGames
 
 final class AppLanguageAndLocalizationTests: XCTestCase {
     private let appLanguageKey = "app_language"

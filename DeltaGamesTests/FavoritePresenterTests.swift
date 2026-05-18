@@ -1,5 +1,6 @@
 import XCTest
 import Combine
+@testable import DeltaGames
 
 final class FavoritePresenterTests: XCTestCase {
     @MainActor

@@ -104,7 +104,6 @@
 		D1A1002C2706E043000D4A8B /* DetailPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A1002D2706E043000D4A8B /* DetailPresenterTests.swift */; };
 		D1A1002E2706E043000D4A8B /* APICall.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D892D91273B388A00518E55 /* APICall.swift */; };
 		D1A1002F2706E043000D4A8B /* DetailPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D8987D52742B5E30063BFC5 /* DetailPresenter.swift */; };
-		D1A100302706E043000D4A8B /* MapperEntityStubs.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A100312706E043000D4A8B /* MapperEntityStubs.swift */; };
 		D1A100322706E043000D4A8B /* AdvancedMapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A100332706E043000D4A8B /* AdvancedMapperTests.swift */; };
 		D1A100342706E043000D4A8B /* GameMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D36CB0427627C9E000AAB72 /* GameMapper.swift */; };
 		D1A100352706E043000D4A8B /* FavoriteMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6CD0DC27685C6D004FF0EE /* FavoriteMapper.swift */; };
@@ -213,7 +212,6 @@
 		D1A100212706E043000D4A8B /* InteractorAndDomainModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractorAndDomainModelTests.swift; sourceTree = "<group>"; };
 		D1A1002B2706E043000D4A8B /* APICallTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APICallTests.swift; sourceTree = "<group>"; };
 		D1A1002D2706E043000D4A8B /* DetailPresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailPresenterTests.swift; sourceTree = "<group>"; };
-		D1A100312706E043000D4A8B /* MapperEntityStubs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapperEntityStubs.swift; sourceTree = "<group>"; };
 		D1A100332706E043000D4A8B /* AdvancedMapperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedMapperTests.swift; sourceTree = "<group>"; };
 		D1A100382706E043000D4A8B /* HomePresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePresenterTests.swift; sourceTree = "<group>"; };
 		D1A1003A2706E043000D4A8B /* SearchPresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchPresenterTests.swift; sourceTree = "<group>"; };
@@ -241,6 +239,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6E6B4BC410C51FDF0787C278 /* Pods_DeltaGames.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -650,7 +649,6 @@
 				D1A100212706E043000D4A8B /* InteractorAndDomainModelTests.swift */,
 				D1A1002B2706E043000D4A8B /* APICallTests.swift */,
 				D1A1002D2706E043000D4A8B /* DetailPresenterTests.swift */,
-				D1A100312706E043000D4A8B /* MapperEntityStubs.swift */,
 				D1A100332706E043000D4A8B /* AdvancedMapperTests.swift */,
 				D1A100382706E043000D4A8B /* HomePresenterTests.swift */,
 				D1A1003A2706E043000D4A8B /* SearchPresenterTests.swift */,
@@ -904,7 +902,6 @@
 				D1A1001F2706E043000D4A8B /* InteractorAndDomainModelTests.swift in Sources */,
 				D1A1002A2706E043000D4A8B /* APICallTests.swift in Sources */,
 				D1A1002C2706E043000D4A8B /* DetailPresenterTests.swift in Sources */,
-				D1A100302706E043000D4A8B /* MapperEntityStubs.swift in Sources */,
 				D1A100322706E043000D4A8B /* AdvancedMapperTests.swift in Sources */,
 				D1A100372706E043000D4A8B /* HomePresenterTests.swift in Sources */,
 				D1A100392706E043000D4A8B /* SearchPresenterTests.swift in Sources */,
@@ -1098,6 +1095,7 @@
 		};
 		D1A100092706E043000D4A8B /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 87E9DAE692E70A5B87864DA2 /* Pods-DeltaGames.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
@@ -1115,6 +1113,7 @@
 		};
 		D1A1000A2706E043000D4A8B /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 24448B2B20E9B6C952D1CA2B /* Pods-DeltaGames.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;

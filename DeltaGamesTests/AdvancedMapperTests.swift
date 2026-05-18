@@ -1,4 +1,5 @@
 import XCTest
+@testable import DeltaGames
 
 final class AdvancedMapperTests: XCTestCase {
     func testGameMapperMapGameResponsesToDomainsMapsNestedCollections() {
@@ -45,27 +46,35 @@ final class AdvancedMapperTests: XCTestCase {
         let entity = GameMapper.mapGameDomainsToEntities(input: model)
 
         XCTAssertEqual(entity.id, 21)
-        XCTAssertEqual(entity.parentPlatforms, ["iOS"])
-        XCTAssertEqual(entity.genres, ["Action"])
-        XCTAssertEqual(entity.tags, ["Co-op"])
+        XCTAssertEqual(Array(entity.parentPlatforms), ["iOS"])
+        XCTAssertEqual(Array(entity.genres), ["Action"])
+        XCTAssertEqual(Array(entity.tags), ["Co-op"])
     }
 
-    func testFavoriteMapperMapFavoriteEntitiesToDomainsMapsArrays() {
-        let entity = FavoriteEntity()
-        entity.id = 5
-        entity.slug = "slug"
-        entity.name = "Name"
-        entity.descript = "Desc"
-        entity.released = "2024-02-02"
-        entity.backgroundImage = "cover"
-        entity.rating = 4.4
-        entity.ratingTop = 5
-        entity.ratingsCount = 50
-        entity.genres = ["Action"]
-        entity.parentPlatforms = ["PC"]
-        entity.tags = ["Singleplayer"]
-
-        let result = FavoriteMapper.mapFavoriteEntitiesToDomains(input: [entity])
+    func testFavoriteMapperMapGameDomainsToEntitiesMapsTagsToTagsCollectionThenBack() {
+        // Create domain model first
+        let model = GameModel(
+            id: 5,
+            slug: "slug",
+            name: "Name",
+            description: "Desc",
+            released: "2024-02-02",
+            imageBackground: "cover",
+            rating: 4.4,
+            ratingTop: 5,
+            ratingsCount: 50,
+            genres: [GenreModel(id: 1, slug: "action", name: "Action", gamesCount: 0, imageBackground: nil)],
+            parentPlatforms: [PlatformModel(platform: PlatformModel.ChildPlatformModel(name: "PC"))],
+            tags: [TagsModel(id: 1, slug: "singleplayer", name: "Singleplayer", language: "en", gamesCount: 0, imageBackground: "")]
+        )
+        
+        // Map to entity
+        let entity = FavoriteMapper.mapGameDomainsToEntities(input: model)
+        
+        // Map back to domain
+        var entities: [FavoriteEntity] = []
+        entities.append(entity)
+        let result = FavoriteMapper.mapFavoriteEntitiesToDomains(input: entities)
 
         XCTAssertEqual(result.count, 1)
         XCTAssertEqual(result.first?.id, 5)
@@ -92,9 +101,9 @@ final class AdvancedMapperTests: XCTestCase {
 
         let entity = FavoriteMapper.mapGameDomainsToEntities(input: model)
 
-        XCTAssertEqual(entity.genres, ["Adventure"])
-        XCTAssertEqual(entity.parentPlatforms, ["PlayStation"])
-        XCTAssertEqual(entity.tags, ["Story Rich"])
+        XCTAssertEqual(Array(entity.genres), ["Adventure"])
+        XCTAssertEqual(Array(entity.parentPlatforms), ["PlayStation"])
+        XCTAssertEqual(Array(entity.tags), ["Story Rich"])
     }
 
     // MARK: - GamesMapper tests
@@ -110,17 +119,38 @@ final class AdvancedMapperTests: XCTestCase {
         let entities = GamesMapper.mapGamesResponsesToEntities(input: [response])
         XCTAssertEqual(entities.count, 1)
         XCTAssertEqual(entities.first?.id, 1)
-        XCTAssertEqual(entities.first?.genres, ["Action"])
-        XCTAssertEqual(entities.first?.parentPlatforms, ["PC"])
+        if let genres = entities.first?.genres {
+            XCTAssertEqual(Array(genres), ["Action"])
+        }
+        if let platforms = entities.first?.parentPlatforms {
+            XCTAssertEqual(Array(platforms), ["PC"])
+        }
     }
 
     func testGamesMapperMapEntitiesToDomains() {
-        let entity = GameEntity()
-        entity.id = 2; entity.slug = "sl"; entity.name = "Nm"
-        entity.descript = "Desc"; entity.released = "2022-01-01"
-        entity.backgroundImage = "bg"; entity.rating = 4.1; entity.ratingTop = 5; entity.ratingsCount = 10
-        entity.genres = ["RPG"]; entity.parentPlatforms = ["Mac"]; entity.tags = ["Singleplayer"]
-        let domains = GamesMapper.mapGamesEntitiesToDomains(input: [entity])
+        // Create domain model first
+        let model = GameModel(
+            id: 2,
+            slug: "sl",
+            name: "Nm",
+            description: "Desc",
+            released: "2022-01-01",
+            imageBackground: "bg",
+            rating: 4.1,
+            ratingTop: 5,
+            ratingsCount: 10,
+            genres: [GenreModel(id: 1, slug: "rpg", name: "RPG", gamesCount: 0, imageBackground: nil)],
+            parentPlatforms: [PlatformModel(platform: PlatformModel.ChildPlatformModel(name: "Mac"))],
+            tags: [TagsModel(id: 1, slug: "singleplayer", name: "Singleplayer", language: "en", gamesCount: 0, imageBackground: "")]
+        )
+        
+        // Map to entity using GameMapper
+        let entity = GameMapper.mapGameDomainsToEntities(input: model)
+        
+        // Map back to domain
+        var entities: [GameEntity] = []
+        entities.append(entity)
+        let domains = GamesMapper.mapGamesEntitiesToDomains(input: entities)
         XCTAssertEqual(domains.first?.id, 2)
         XCTAssertEqual(domains.first?.genres?.first?.name, "RPG")
         XCTAssertEqual(domains.first?.tags?.first?.name, "Singleplayer")
@@ -150,16 +180,25 @@ final class AdvancedMapperTests: XCTestCase {
         let entities = TrendingMapper.mapTrendingResponsesToEntities(input: [response])
         XCTAssertEqual(entities.count, 1)
         XCTAssertEqual(entities.first?.id, 10)
-        XCTAssertEqual(entities.first?.parentPlatforms, ["PS5"])
+        if let platforms = entities.first?.parentPlatforms {
+            XCTAssertEqual(Array(platforms), ["PS5"])
+        }
     }
 
     func testTrendingMapperMapEntitiesToDomains() {
-        let entity = TrendingEntity()
-        entity.id = 11; entity.slug = "tr"; entity.name = "T"
-        entity.descript = "D"; entity.released = "2023-01-01"
-        entity.backgroundImage = "bg"; entity.rating = 4.2; entity.ratingTop = 5; entity.ratingsCount = 50
-        entity.genres = ["Action"]; entity.parentPlatforms = ["Xbox"]; entity.tags = ["Multiplayer"]
-        let domains = TrendingMapper.mapTrendingEntitiesToDomains(input: [entity])
+        let response = TrendingResponse(
+            id: 11, slug: "tr", name: "T", description: "D", released: "2023-01-01",
+            imageBackground: "bg", rating: 4.2, ratingTop: 5, ratingsCount: 50,
+            genres: [GenreResponse(id: 1, slug: "action", name: "Action", gamesCount: 0, imageBackground: nil)],
+            parentPlatforms: [PlatformResponse(platform: PlatformResponse.ChildPlatformResponse(id: 1, slug: "xbox", name: "Xbox"))],
+            tags: [TagsResponse(id: 1, slug: "multiplayer", name: "Multiplayer", language: "en", gamesCount: 0, imageBackground: "")]
+        )
+        
+        // Map response to entity
+        let entities = TrendingMapper.mapTrendingResponsesToEntities(input: [response])
+        
+        // Map back to domain
+        let domains = TrendingMapper.mapTrendingEntitiesToDomains(input: entities)
         XCTAssertEqual(domains.first?.id, 11)
         XCTAssertEqual(domains.first?.genres?.first?.name, "Action")
         XCTAssertEqual(domains.first?.tags?.first?.name, "Multiplayer")

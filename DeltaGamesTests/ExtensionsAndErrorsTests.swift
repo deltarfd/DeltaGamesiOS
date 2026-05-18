@@ -1,8 +1,9 @@
 import XCTest
+@testable import DeltaGames
 
 final class ExtensionsAndErrorsTests: XCTestCase {
     func testDoubleFormattedProducesTwoDecimalsWithSuffix() {
-        XCTAssertEqual(4.567.formatted(), "4.57/5")
+        XCTAssertEqual(4.567.formatted(maxRating: 5), "4.57/5")
         XCTAssertEqual(4.567.formatted(maxRating: 10), "4.57/10")
     }
 

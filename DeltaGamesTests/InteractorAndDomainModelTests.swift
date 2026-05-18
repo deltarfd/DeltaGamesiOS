@@ -1,5 +1,6 @@
 import Combine
 import XCTest
+@testable import DeltaGames
 
 final class InteractorAndDomainModelTests: XCTestCase {
     private var cancellables: Set<AnyCancellable> = []
