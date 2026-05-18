@@ -3,7 +3,7 @@
 [![iOS CI](https://github.com/deltarfd/DeltaGamesiOS/actions/workflows/ios-ci.yml/badge.svg)](https://github.com/deltarfd/DeltaGamesiOS/actions/workflows/ios-ci.yml)
 [![Security and Dependencies](https://github.com/deltarfd/DeltaGamesiOS/actions/workflows/security-and-deps.yml/badge.svg)](https://github.com/deltarfd/DeltaGamesiOS/actions/workflows/security-and-deps.yml)
 
-DeltaGames is a SwiftUI iOS app for discovering game data from RAWG API with favorite management and profile features.
+DeltaGames is a modern iOS game discovery application built with SwiftUI and powered by the RAWG API. This repository showcases a clean, modular architecture with clear separation between presentation, domain, data, and persistence layers, plus reusable feature modules for Home, Detail, Favorite, Search, and Profile. It is designed as both a production-ready app foundation and a learning reference for scalable iOS development, including unit tests, CI automation, linting, and secure API key handling.
 
 
 ## Submission Result
