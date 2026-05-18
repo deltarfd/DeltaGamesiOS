@@ -1,0 +1,306 @@
+name: iOS CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  lint-build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Prepare RAWG API Key Config
+        env:
+          RAWG_API_KEY: ${{ secrets.RAWG_API_KEY }}
+        run: |
+          if [ -z "${RAWG_API_KEY:-}" ]; then
+            echo "RAWG_API_KEY is missing (common on pull_request from forks)."
+            echo "Using a non-secret CI fallback key so build/tests can still run."
+            CI_API_KEY="ci_fallback_key_no_secrets"
+          else
+            CI_API_KEY="$RAWG_API_KEY"
+          fi
+
+          /usr/libexec/PlistBuddy -c "Set :API_KEY $CI_API_KEY" DeltaGames/Resources/RawgAPI.plist \
+            || /usr/libexec/PlistBuddy -c "Add :API_KEY string $CI_API_KEY" DeltaGames/Resources/RawgAPI.plist
+
+      - name: Select Latest Stable Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Install SwiftLint
+        run: brew install swiftlint
+
+      - name: Install CocoaPods
+        run: |
+          gem install cocoapods --no-document
+          pod install --repo-update
+
+      - name: Run SwiftLint
+        run: swiftlint lint --config .swiftlint.yml DeltaGames
+
+      - name: Build App
+        env:
+          RAWG_API_KEY: ${{ secrets.RAWG_API_KEY }}
+        run: |
+          xcodebuild \
+            -workspace DeltaGames.xcworkspace \
+            -scheme DeltaGames \
+            -destination 'generic/platform=iOS Simulator' \
+            -configuration Debug \
+            -derivedDataPath DerivedData \
+            -enableCodeCoverage YES \
+            clean build-for-testing
+
+      - name: Start iOS Simulator
+        run: |
+          SIM_ID=$(xcrun simctl list devices available --json | python3 -c 'import json,sys;d=json.load(sys.stdin).get("devices",{});pref=["iPhone 17 Pro Max","iPhone 17 Pro","iPhone 17","iPhone 16 Pro Max","iPhone 16 Pro","iPhone 16","iPhone SE (3rd generation)"];c=[dev for rt,arr in d.items() if "iOS" in rt for dev in arr if dev.get("isAvailable") and dev.get("name","").startswith("iPhone")];print(next((dev.get("udid","") for n in pref for dev in c if dev.get("name")==n),(c[0].get("udid","") if c else "")))')
+
+          if [ -z "$SIM_ID" ]; then
+            echo "No available iPhone simulator found on this runner."
+            xcrun simctl list devices available
+            exit 1
+          fi
+
+          wait_for_boot() {
+            local udid="$1"
+            local timeout_sec=180
+            local start_ts
+            start_ts=$(date +%s)
+
+            while true; do
+              state=$(xcrun simctl list devices --json | python3 -c 'import json,sys;d=json.load(sys.stdin).get("devices",{});u=sys.argv[1];print(next((dev.get("state","Unknown") for arr in d.values() for dev in arr if dev.get("udid")==u),"Unknown"))' "$udid")
+
+              if [ "$state" = "Booted" ]; then
+                return 0
+              fi
+
+              now_ts=$(date +%s)
+              if [ $((now_ts - start_ts)) -ge "$timeout_sec" ]; then
+                echo "Simulator failed to boot within ${timeout_sec}s. Last state: $state"
+                return 1
+              fi
+
+              sleep 5
+            done
+          }
+
+          xcrun simctl shutdown all || true
+          xcrun simctl boot "$SIM_ID" || true
+
+          if ! wait_for_boot "$SIM_ID"; then
+            echo "Retrying simulator boot after reset..."
+            xcrun simctl shutdown "$SIM_ID" || true
+            xcrun simctl erase "$SIM_ID" || true
+            xcrun simctl boot "$SIM_ID" || true
+            wait_for_boot "$SIM_ID" || {
+              echo "Simulator boot retry failed."
+              xcrun simctl list devices available
+              exit 1
+            }
+          fi
+
+          echo "Using simulator ID: $SIM_ID"
+          echo "IOS_DESTINATION=platform=iOS Simulator,id=$SIM_ID" >> "$GITHUB_ENV"
+
+      - name: Run App Tests (includes SPM dependencies)
+        timeout-minutes: 20
+        env:
+          RAWG_API_KEY: ${{ secrets.RAWG_API_KEY }}
+        run: |
+          xcodebuild \
+            -workspace DeltaGames.xcworkspace \
+            -scheme DeltaGames \
+            -destination "$IOS_DESTINATION" \
+            -destination-timeout 120 \
+            -configuration Debug \
+            -derivedDataPath DerivedData \
+            -resultBundlePath TestResults.xcresult \
+            -enableCodeCoverage YES \
+            -parallel-testing-enabled NO \
+            -only-testing:DeltaGamesTests \
+            test-without-building
+
+      - name: Generate Coverage Report
+        if: always()
+        run: |
+          mkdir -p coverage
+
+          if [ -d "TestResults.xcresult" ]; then
+            if xcrun xccov view --report TestResults.xcresult > coverage/coverage.txt; then
+              :
+            else
+              echo "Failed to generate text coverage report." > coverage/coverage.txt
+            fi
+
+            if xcrun xccov view --report --json TestResults.xcresult > coverage/coverage.json; then
+              :
+            else
+              echo "{}" > coverage/coverage.json
+            fi
+
+            APP_LINE=$(grep -E '\.app([[:space:]]|$)' coverage/coverage.txt | grep -vi test | head -n 1 || true)
+            if [ -n "$APP_LINE" ]; then
+              APP_NAME=$(echo "$APP_LINE" | awk '{$NF=""; sub(/[[:space:]]+$/, ""); print}')
+              APP_COVERAGE=$(echo "$APP_LINE" | awk '{print $NF}')
+            else
+              APP_NAME="Unknown App Target"
+              APP_COVERAGE="N/A"
+            fi
+
+            {
+              echo "# Coverage Summary"
+              echo
+              echo "Target: $APP_NAME"
+              echo "Overall line coverage: $APP_COVERAGE"
+              echo
+              echo "## Lowest Coverage Files (Top 10)"
+              echo
+              echo '| File | Coverage |'
+              echo '| --- | ---: |'
+              grep -E '(/|\\.swift)' coverage/coverage.txt | tail -n 10 | awk '{
+                file=$0
+                cov=$NF
+                sub(/[[:space:]]*[^[:space:]]+$/, "", file)
+                gsub(/^[[:space:]]+|[[:space:]]+$/, "", file)
+                printf("| %s | %s |\n", file, cov)
+              }'
+            } > coverage/summary.md
+
+            cat coverage/summary.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "TestResults.xcresult not found. Skipping coverage extraction." | tee coverage/summary.md
+            cat coverage/summary.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Generate LCOV for Codecov
+        if: always()
+        run: |
+          mkdir -p coverage
+
+          if [ ! -d "TestResults.xcresult" ]; then
+            echo "TestResults.xcresult not found. Coverage generation skipped."
+            exit 0
+          fi
+
+          # Try xcresult first, then fall back to DerivedData.
+          PROFDATA=$(find TestResults.xcresult -type f -name "*.profdata" 2>/dev/null | head -n 1 || true)
+          if [ -z "$PROFDATA" ]; then
+            PROFDATA=$(find DerivedData -type f -name "*.profdata" 2>/dev/null | head -n 1 || true)
+          fi
+
+          if [ -z "$PROFDATA" ]; then
+            echo "No .profdata found in TestResults.xcresult or DerivedData."
+            echo "Skipping LCOV generation and relying on xccov JSON fallback upload."
+            exit 0
+          fi
+
+          MAIN_BIN=$(find DerivedData/Build/Products -type f \
+            -path '*Debug-iphonesimulator/DeltaGames.app/DeltaGames' 2>/dev/null | head -n 1 || true)
+          if [ -z "$MAIN_BIN" ]; then
+            echo "Main app binary not found. Coverage generation skipped."
+            exit 0
+          fi
+
+          TEST_BIN=$(find DerivedData/Build/Products -type f \
+            -path '*Debug-iphonesimulator/DeltaGamesTests.xctest/DeltaGamesTests' 2>/dev/null | head -n 1 || true)
+
+          ARCHS=$(xcrun lipo -archs "$MAIN_BIN" 2>/dev/null || true)
+          # Pick the arch matching the runner (arm64 on Apple Silicon, x86_64 on Intel)
+          # to avoid 'no coverage data found' on fat binaries.
+          HOST_ARCH=$(uname -m)
+          if echo "$ARCHS" | grep -qw "$HOST_ARCH"; then
+            COV_ARCH="$HOST_ARCH"
+          else
+            COV_ARCH=$(echo "$ARCHS" | awk '{print $1}')
+          fi
+
+          echo "Using profdata : $PROFDATA"
+          echo "Using app binary: $MAIN_BIN"
+          echo "Binary archs    : ${ARCHS:-unknown}, using: $COV_ARCH"
+
+          LLVM_COV_CMD=(xcrun llvm-cov export \
+            -format=lcov \
+            -instr-profile "$PROFDATA" \
+            -arch "$COV_ARCH" \
+            --ignore-filename-regex='.*/Pods/.*|.*/DerivedData/.*|.*Tests\.swift' \
+            "$MAIN_BIN")
+
+          if [ -n "$TEST_BIN" ]; then
+            LLVM_COV_CMD+=("$TEST_BIN")
+          fi
+
+          if ! "${LLVM_COV_CMD[@]}" > coverage/lcov.raw.info 2>&1; then
+            echo "llvm-cov export failed. Output:"
+            cat coverage/lcov.raw.info || true
+            exit 0
+          fi
+
+          # Normalize source file paths for Codecov repo-relative mapping.
+          if [ -n "${GITHUB_WORKSPACE:-}" ]; then
+            sed "s#^SF:${GITHUB_WORKSPACE}/#SF:#" coverage/lcov.raw.info > coverage/lcov.info
+          else
+            cp coverage/lcov.raw.info coverage/lcov.info
+          fi
+
+          if [ ! -s coverage/lcov.info ] || ! grep -q '^SF:' coverage/lcov.info; then
+            echo "Generated LCOV is empty or has no source file records."
+            exit 0
+          fi
+
+          echo "LCOV source file count: $(grep -c '^SF:' coverage/lcov.info || true)"
+          echo "Generated coverage/lcov.info for Codecov upload."
+
+      - name: Upload Coverage to Codecov
+        if: always() && hashFiles('coverage/lcov.info') != ''
+        uses: codecov/codecov-action@v5
+        with:
+          files: coverage/lcov.info
+          disable_search: true
+          flags: ios
+          fail_ci_if_error: false
+          verbose: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload Coverage JSON Fallback to Codecov
+        if: always() && hashFiles('coverage/lcov.info') == '' && hashFiles('coverage/coverage.json') != ''
+        uses: codecov/codecov-action@v5
+        with:
+          files: coverage/coverage.json
+          disable_search: true
+          flags: ios
+          fail_ci_if_error: false
+          verbose: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload Coverage Artifacts
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: coverage-report
+          path: |
+            coverage/
+            TestResults.xcresult
+          retention-days: 30
+
+      - name: Upload Build Artifacts
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: build-output
+          path: DerivedData/
+          retention-days: 30
+
+      - name: Upload Build Logs
+        if: failure()
+        uses: actions/upload-artifact@v5
+        with:
+          name: build-logs
+          path: /tmp/xcodebuild_logs/
+          retention-days: 7

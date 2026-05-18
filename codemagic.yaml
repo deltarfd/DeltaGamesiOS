@@ -1,0 +1,87 @@
+workflows:
+  ios-release-pipeline:
+    name: DeltaGames iOS Pipeline
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: "*"
+          include: true
+          source: true
+      cancel_previous_builds: true
+    instance_type: mac_mini_m2
+    environment:
+      xcode: latest
+      cocoapods: default
+      groups:
+        - "RAWG API"
+    scripts:
+      - name: Install Pods
+        script: |
+          pod install --repo-update
+      - name: Prepare RAWG API Key Config
+        script: |
+          RAWG_API_KEY_RESOLVED="${RAWG_API_KEY:-${CODEMAGIC_BUILD_RAWG_API_KEY:-}}"
+          if [ -z "$RAWG_API_KEY_RESOLVED" ]; then
+            echo "RAWG_API_KEY is missing in Codemagic runtime env."
+            echo "Expected one of: RAWG_API_KEY or CODEMAGIC_BUILD_RAWG_API_KEY"
+            exit 1
+          fi
+
+          /usr/libexec/PlistBuddy -c "Set :API_KEY $RAWG_API_KEY_RESOLVED" DeltaGames/Resources/RawgAPI.plist \
+            || /usr/libexec/PlistBuddy -c "Add :API_KEY string $RAWG_API_KEY_RESOLVED" DeltaGames/Resources/RawgAPI.plist
+
+          export RAWG_API_KEY="$RAWG_API_KEY_RESOLVED"
+      - name: Lint
+        script: |
+          if ! command -v swiftlint >/dev/null 2>&1; then
+            brew install swiftlint
+          fi
+          swiftlint lint --config .swiftlint.yml DeltaGames
+      - name: Run App Tests (includes SPM dependencies)
+        script: |
+          export RAWG_API_KEY="${RAWG_API_KEY:-${CODEMAGIC_BUILD_RAWG_API_KEY:-}}"
+
+          SIM_ID=$(xcrun simctl list devices available --json | python3 -c 'import json,sys;d=json.load(sys.stdin).get("devices",{});pref=["iPhone 17 Pro Max","iPhone 17 Pro","iPhone 17","iPhone 17e","iPhone 16e","iPhone Air"];c=[dev for rt,arr in d.items() if "iOS" in rt for dev in arr if dev.get("isAvailable") and dev.get("name","").startswith("iPhone")];print(next((dev.get("udid","") for n in pref for dev in c if dev.get("name")==n),(c[0].get("udid","") if c else "")))')
+          
+          if [ -z "$SIM_ID" ]; then
+            echo "No available iPhone simulator found on Codemagic machine"
+            xcrun simctl list devices available
+            exit 1
+          fi
+
+          xcrun simctl boot "$SIM_ID" || true
+          xcrun simctl bootstatus "$SIM_ID" -b
+
+          echo "Using simulator ID: $SIM_ID"
+          xcodebuild \
+            -workspace DeltaGames.xcworkspace \
+            -scheme DeltaGames \
+            -destination "platform=iOS Simulator,id=$SIM_ID" \
+            -configuration Debug \
+            -derivedDataPath "$CM_BUILD_DIR/DerivedData" \
+            -enableCodeCoverage YES \
+            test
+      - name: Build iOS (Simulator)
+        script: |
+          export RAWG_API_KEY="${RAWG_API_KEY:-${CODEMAGIC_BUILD_RAWG_API_KEY:-}}"
+          xcodebuild \
+            -workspace DeltaGames.xcworkspace \
+            -scheme DeltaGames \
+            -destination 'generic/platform=iOS Simulator' \
+            -configuration Release \
+            -derivedDataPath "$CM_BUILD_DIR/DerivedData" \
+            clean build
+      - name: Package app artifact
+        script: |
+          mkdir -p "$CM_BUILD_DIR/artifacts"
+          APP_PATH=$(find "$CM_BUILD_DIR/DerivedData/Build/Products" -type d -name "*.app" | head -1)
+          if [ -z "$APP_PATH" ]; then
+            echo "No .app bundle found under DerivedData products"
+            exit 1
+          fi
+          ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" "$CM_BUILD_DIR/artifacts/DeltaGames-Simulator.app.zip"
+    artifacts:
+      - $CM_BUILD_DIR/DerivedData/Build/Products/**/*.app
+      - $CM_BUILD_DIR/artifacts/*.zip
+      - /tmp/xcodebuild_logs/**/*.log
