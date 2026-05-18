@@ -8,9 +8,6 @@
 import Foundation
 
 protocol ProfileUseCase {
-
-//  func getGames(completion: @escaping (Result<[GameModel], Error>) -> Void)
-
 }
 
 class ProfileInteractor: ProfileUseCase {
@@ -20,13 +17,4 @@ class ProfileInteractor: ProfileUseCase {
   required init(repository: GamesRepositoryProtocol) {
     self.repository = repository
   }
-  
-//  func getGames(
-//    completion: @escaping (Result<[GameModel], Error>) -> Void
-//  ) {
-//    repository.getGames { result in
-//      completion(result)
-//    }
-//  }
-
 }

@@ -6,11 +6,6 @@
 //
 
 import SwiftUI
-import HomeFeature
-import DetailFeature
-import FavoriteFeature
-import SearchFeature
-import ProfileFeature
 
 struct MainView: View {
 
@@ -56,16 +51,5 @@ struct MainView: View {
                     }
                 }.tag(3)
         }
-    }
-}
-
-struct MainView_Previews: PreviewProvider {
-    static var previews: some View {
-        MainView()
-            .previewDevice("iPhone 12 Pro Max")
-            .preferredColorScheme(.dark)
-        MainView()
-            .previewDevice("iPhone 8")
-            .preferredColorScheme(.dark)
     }
 }

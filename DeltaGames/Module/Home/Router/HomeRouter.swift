@@ -12,7 +12,7 @@ final class HomeRouter {
 
   func makeDetailView(for game: GameModel) -> some View {
     return Group {
-      let detailUseCase = Injection.init().provideDetail(game: game)
+      let detailUseCase = Injection.shared.provideDetail()
       let presenter = DetailPresenter(id: "\(game.id)", detailUseCase: detailUseCase)
       DetailView(presenter: presenter)
     }

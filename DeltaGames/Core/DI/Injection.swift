@@ -8,7 +8,7 @@
 import Foundation
 import RealmSwift
 
-final class Injection: NSObject {
+final class Injection {
   
   static let shared = Injection()
   private func provideRepository() -> GamesRepositoryProtocol {
@@ -25,7 +25,7 @@ final class Injection: NSObject {
     return HomeInteractor(repository: repository)
   }
 
-  func provideDetail(game: GameModel) -> DetailUseCase {
+  func provideDetail() -> DetailUseCase {
     let repository = provideRepository()
     return DetailInteractor(repository: repository)
   }
@@ -40,8 +40,4 @@ final class Injection: NSObject {
     return SearchInteractor(repository: repository)
   }
   
-  func provideProfile() -> ProfileUseCase {
-    let repository = provideRepository()
-    return ProfileInteractor(repository: repository)
-  }
 }

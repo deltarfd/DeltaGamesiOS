@@ -12,7 +12,7 @@ final class FavoriteRouter {
 
   func makeDetailView(for game: GameModel, onDismiss: ((FavoriteChange?) -> Void)? = nil) -> some View {
     return Group {
-      let detailUseCase = Injection.init().provideDetail(game: game)
+      let detailUseCase = Injection.shared.provideDetail()
       let presenter = DetailPresenter(id: "\(game.id)", detailUseCase: detailUseCase)
       DetailView(presenter: presenter, onDismiss: onDismiss)
     }

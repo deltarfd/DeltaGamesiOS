@@ -6,11 +6,6 @@
 //
 
 import SwiftUI
-import HomeFeature
-import DetailFeature
-import FavoriteFeature
-import SearchFeature
-import ProfileFeature
 
 @main
 struct DeltaGamesApp: App {
